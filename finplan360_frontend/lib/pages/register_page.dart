@@ -1,21 +1,40 @@
 import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/components/my_textfield.dart';
 import 'package:finplan360_frontend/pages/home_page.dart';
-import 'package:finplan360_frontend/pages/register_page.dart';
+import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   // text editing controllers
+  final fullnameController = TextEditingController();
+  final dobController = TextEditingController();
   final usernameController = TextEditingController();
-
   final passwordController = TextEditingController();
+  final confirmpasswordController = TextEditingController();
+
+  // date picker
+  void _showDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    ).then((pickedDate) {
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        dobController.text = pickedDate.toString();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,20 +51,64 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const Icon(
                   Icons.currency_rupee_rounded,
-                  size: 100,
+                  size: 50,
                 ),
                 const SizedBox(
-                  height: 50,
+                  height: 25,
                 ),
                 Text(
-                  'Welcome back!',
+                  'Let\'s get started',
                   style: TextStyle(
                     color: Colors.grey[700],
-                    fontSize: 16,
+                    fontSize: 20,
                   ),
                 ),
                 const SizedBox(
                   height: 25,
+                ),
+
+                //full name
+                MyTextField(
+                  controller: fullnameController,
+                  hintText: 'Full Name',
+                  obscureText: false,
+                ),
+
+                const SizedBox(
+                  height: 10,
+                ),
+
+                //date of birth
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Choose Date of Birth: ',
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    IconButton(
+                      onPressed: _showDatePicker,
+                      icon: const Icon(Icons.calendar_today),
+                    ),
+                    // display date of birth
+                    Text(
+                      dobController.text,
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(
+                  height: 10,
                 ),
 
                 //username
@@ -70,18 +133,29 @@ class _LoginPageState extends State<LoginPage> {
                   height: 10,
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
+                // confirm password
+                MyTextField(
+                  controller: passwordController,
+                  hintText: 'Confirm Password',
+                  obscureText: true,
                 ),
+
+                // const SizedBox(
+                //   height: 10,
+                // ),
+
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 25),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.end,
+                //     children: [
+                //       Text(
+                //         'Forgot Password?',
+                //         style: TextStyle(color: Colors.grey[600]),
+                //       ),
+                //     ],
+                //   ),
+                // ),
 
                 const SizedBox(
                   height: 25,
@@ -95,11 +169,11 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const HomePage(),
+                        builder: (context) => const LoginPage(),
                       ),
                     );
                   },
-                  text: 'Sign In',
+                  text: 'Sign Up',
                 ),
 
                 // Google sign in ???
@@ -135,18 +209,18 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Not a member?'),
+                    const Text('Already have an account?'),
                     TextButton(
                       onPressed: () {
-                        // register page
+                        // login page
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const RegisterPage(),
+                            builder: (context) => const LoginPage(),
                           ),
                         );
                       },
-                      child: const Text('Register Now'),
+                      child: const Text('Login now'),
                     ),
                   ],
                 )
