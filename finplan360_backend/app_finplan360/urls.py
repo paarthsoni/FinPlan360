@@ -5,5 +5,5 @@ from app_finplan360 import views
 
 urlpatterns = [
 
-    path('hello/', views.hello, name="hello"),
+    path('', views.hello, name="hello"),
 ]
