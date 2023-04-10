@@ -1,13 +1,115 @@
+import 'package:finplan360_frontend/components/my_button.dart';
+import 'package:finplan360_frontend/components/my_textfield.dart';
+import 'package:finplan360_frontend/pages/home_page.dart';
+import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-class AuthPage extends StatelessWidget {
-  const AuthPage({super.key});
+class AuthPage extends StatefulWidget {
+  const AuthPage({Key? key}) : super(key: key);
+
+  @override
+  State<AuthPage> createState() => _AuthPageState();
+}
+
+class _AuthPageState extends State<AuthPage> {
+  // text editing controllers
+  final aadharorPanController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // check if user is logged in via django backend api
-        // if yes, then show home page else show login page
-        );
+      backgroundColor: Colors.grey[300],
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(
+                  height: 25,
+                ),
+                const Icon(
+                  Icons.currency_rupee_rounded,
+                  size: 50,
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+                Text(
+                  'Authenticate via Aadhar or Pan',
+                  style: TextStyle(
+                    color: Colors.grey[700],
+                    fontSize: 20,
+                  ),
+                ),
+                const SizedBox(
+                  height: 25,
+                ),
+
+                //aadhar or pan
+                MyTextField(
+                  controller: aadharorPanController,
+                  hintText: 'Aadhar or Pan',
+                  obscureText: false,
+                ),
+
+                const SizedBox(
+                  height: 10,
+                ),
+
+               
+
+                //login button
+                MyButton(
+                  onTap: () {
+                    // login
+                    try {} catch (e) {}
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                    );
+                  },
+                  text: 'Authenticate',
+                ),
+
+                // Google sign in ???
+                // const SizedBox(
+                //   height: 50,
+                // ),
+
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 25),
+                //   child: Row(
+                //     children: [
+                //       Expanded(
+                //           child: Divider(
+                //         color: Colors.grey[400],
+                //         thickness: 0.7,
+                //       )),
+                //       Padding(
+                //         padding: const EdgeInsets.symmetric(horizontal: 10),
+                //         child: Text(
+                //           'Or Continue With',
+                //           style: TextStyle(color: Colors.grey[700]),
+                //         ),
+                //       ),
+                //       Expanded(
+                //           child: Divider(
+                //         color: Colors.grey[400],
+                //         thickness: 0.7,
+                //       )),
+                //     ],
+                //   ),
+                // ),
+
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
