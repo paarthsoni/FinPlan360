@@ -1,5 +1,4 @@
 import 'package:finplan360_frontend/components/my_button.dart';
-import 'package:finplan360_frontend/components/my_textfield.dart';
 import 'package:finplan360_frontend/pages/auth_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
@@ -68,11 +67,31 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 25,
                 ),
 
-                //full name
-                MyTextField(
-                  controller: fullnameController,
-                  hintText: 'Full Name',
-                  obscureText: false,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: fullnameController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: "Full Name",
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) => fullnameController.text = value,
+                  ),
                 ),
 
                 const SizedBox(
@@ -113,10 +132,32 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 //username
-                MyTextField(
-                  controller: usernameController,
-                  hintText: 'Username',
-                  obscureText: false,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: usernameController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: 'Username',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) => usernameController.text = value,
+                  ),
                 ),
 
                 const SizedBox(
@@ -124,10 +165,32 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 //password
-                MyTextField(
-                  controller: passwordController,
-                  hintText: 'Password',
-                  obscureText: true,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: 'Password',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) => passwordController.text = value,
+                  ),
                 ),
 
                 const SizedBox(
@@ -135,10 +198,33 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
 
                 // confirm password
-                MyTextField(
-                  controller: passwordController,
-                  hintText: 'Confirm Password',
-                  obscureText: true,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: confirmpasswordController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: 'Confirm Password',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) =>
+                        confirmpasswordController.text = value,
+                  ),
                 ),
 
                 // const SizedBox(

@@ -1,5 +1,4 @@
 import 'package:finplan360_frontend/components/my_button.dart';
-import 'package:finplan360_frontend/components/my_textfield.dart';
 import 'package:finplan360_frontend/pages/home_page.dart';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/material.dart';
@@ -50,10 +49,32 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 //username
-                MyTextField(
-                  controller: usernameController,
-                  hintText: 'Username',
-                  obscureText: false,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: usernameController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: 'Username',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) => usernameController.text = value,
+                  ),
                 ),
 
                 const SizedBox(
@@ -61,10 +82,32 @@ class _LoginPageState extends State<LoginPage> {
                 ),
 
                 //password
-                MyTextField(
-                  controller: passwordController,
-                  hintText: 'Password',
-                  obscureText: true,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: 'Password',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) => passwordController.text = value,
+                  ),
                 ),
 
                 const SizedBox(

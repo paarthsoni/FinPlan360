@@ -1,5 +1,4 @@
 import 'package:finplan360_frontend/components/my_button.dart';
-import 'package:finplan360_frontend/components/my_textfield.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -47,10 +46,32 @@ class _AuthPageState extends State<AuthPage> {
                 ),
 
                 //aadhar or pan
-                MyTextField(
-                  controller: aadharorPanController,
-                  hintText: 'Aadhar or Pan',
-                  obscureText: false,
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: aadharorPanController,
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: 'Aadhar or Pan',
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) => aadharorPanController.text = value,
+                  ),
                 ),
 
                 const SizedBox(
