@@ -1,7 +1,6 @@
 import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/components/my_textfield.dart';
-import 'package:finplan360_frontend/pages/home_page.dart';
-import 'package:finplan360_frontend/pages/register_page.dart';
+import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -58,9 +57,7 @@ class _AuthPageState extends State<AuthPage> {
                   height: 10,
                 ),
 
-               
-
-                //login button
+                //authenticate button
                 MyButton(
                   onTap: () {
                     // login
@@ -104,7 +101,6 @@ class _AuthPageState extends State<AuthPage> {
                 //     ],
                 //   ),
                 // ),
-
               ],
             ),
           ),

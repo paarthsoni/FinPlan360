@@ -1,6 +1,6 @@
 import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/components/my_textfield.dart';
-import 'package:finplan360_frontend/pages/home_page.dart';
+import 'package:finplan360_frontend/pages/auth_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -170,7 +170,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
+                        builder: (context) => const AuthPage(),
                       ),
                     );
                   },
