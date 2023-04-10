@@ -256,7 +256,12 @@ class _RegisterPageState extends State<RegisterPage> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AuthPage(),
+                        builder: (context) => AuthPage(
+                          fullname: fullnameController.text,
+                          username: usernameController.text,
+                          password: passwordController.text,
+                          dob: dobController.text,
+                        ),
                       ),
                     );
                   },

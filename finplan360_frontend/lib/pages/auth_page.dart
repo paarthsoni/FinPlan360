@@ -4,15 +4,34 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class AuthPage extends StatefulWidget {
-  const AuthPage({Key? key}) : super(key: key);
+  final String username;
+  final String fullname;
+  final String password;
+  final String dob;
+
+  const AuthPage({
+    Key? key,
+    required this.username,
+    required this.fullname,
+    required this.password,
+    required this.dob,
+  }) : super(key: key);
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
+  State<AuthPage> createState() =>
+      _AuthPageState(username, fullname, password, dob);
 }
 
 class _AuthPageState extends State<AuthPage> {
+  final String username;
+  final String fullname;
+  final String password;
+  final String dob;
+
   // text editing controllers
   final aadharorPanController = TextEditingController();
+
+  _AuthPageState(this.username, this.fullname, this.password, this.dob);
 
   @override
   Widget build(BuildContext context) {
