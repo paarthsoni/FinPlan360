@@ -1,4 +1,5 @@
 import json
+from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
 from app_finplan360 import urls
 from django.views.decorators.csrf import csrf_exempt
@@ -49,17 +50,15 @@ def useraccountdetails(request):
                     userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username,
                                            password=password, panoraadhar=aadharorpan, acc_creation_date=datetime.now())
                     userdata.save()
-                    print("matched")
+                    # print("matched")
+                    return JsonResponse({'response': 'Account Created Sucessfully'})
 
             elif 'result' not in response:
-                print("invalid pan or aadhar number")
-
+                return JsonResponse({'response': 'Invalid Pan number'})
         # elif len(aadharorpan) == 12:
         #     d
 
         else:
-            print("invalid pan or aadhar number")
-
+            return JsonResponse({'response': 'Invalid Pan number'})
     elif flag == 1:
-        print("username already exists")
-    return HttpResponse("hello")
+        return JsonResponse({'response': 'Username already exists'})
