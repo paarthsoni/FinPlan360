@@ -3,12 +3,14 @@ from django.db import models
 
 
 class useraccount(models.Model):
-    fullname = models.CharField(null=False, default="", max_length=1024)
+    firstname = models.CharField(null=False, default="", max_length=1024)
+    lastname = models.CharField(null=False, default="", max_length=1024)
     dob = models.DateField(null=False, default="")
     username = models.CharField(null=False, unique=True, max_length=1024)
     password = models.CharField(null=False, default="", max_length=1024)
-    acc_creation_dte = models.DateTimeField(
+    panoraadhar = models.CharField(null=False, default="", max_length=12)
+    acc_creation_date = models.DateTimeField(
         default=datetime.now(), blank=None, null=None)
 
     def __str__(self):
-        return self.fullname
+        return self.firstname + " " + self.lastname

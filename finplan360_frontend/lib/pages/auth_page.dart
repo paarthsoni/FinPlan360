@@ -2,6 +2,18 @@ import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class AuthPage extends StatefulWidget {
   final String username;
@@ -92,6 +104,7 @@ class _AuthPageState extends State<AuthPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: TextField(
                     controller: aadharorPanController,
+                    inputFormatters: [UpperCaseTextFormatter()],
                     obscureText: false,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(

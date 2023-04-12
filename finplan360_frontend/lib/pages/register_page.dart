@@ -100,7 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       fillColor: Colors.grey.shade200,
                       filled: true,
-                      hintText: "Full Name",
+                      hintText: "First Name",
                       hintStyle: TextStyle(
                         color: Colors.grey[500],
                       ),
@@ -249,7 +249,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: TextField(
                     controller: confirmpasswordController,
-                    obscureText: false,
+                    obscureText: true,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(
@@ -308,8 +308,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             firstName: firstNameController.text,
                             lastName: lastNameController.text,
                             username: usernameController.text,
-                            password: passwordController.text,
                             dob: dobController.text,
+                            password: passwordController.text,
                           ),
                         ),
                       );
