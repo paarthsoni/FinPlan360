@@ -3,6 +3,7 @@ import 'package:finplan360_frontend/pages/auth_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class UpperCaseTextFormatter extends TextInputFormatter {
@@ -44,7 +45,7 @@ class _RegisterPageState extends State<RegisterPage> {
         return;
       }
       setState(() {
-        dobController.text = pickedDate.toString();
+        dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
       });
     });
   }
@@ -106,6 +107,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     onSubmitted: (value) => firstNameController.text = value,
                   ),
+                ),
+                const SizedBox(
+                  height: 10,
                 ),
                 // last name
                 Padding(

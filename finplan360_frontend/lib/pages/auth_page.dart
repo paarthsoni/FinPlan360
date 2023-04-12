@@ -76,7 +76,7 @@ class _AuthPageState extends State<AuthPage> {
                   height: 25,
                 ),
                 Text(
-                  'Authenticate via Aadhar or Pan',
+                  'Authenticate via Pan',
                   style: TextStyle(
                     color: Colors.grey[700],
                     fontSize: 20,
