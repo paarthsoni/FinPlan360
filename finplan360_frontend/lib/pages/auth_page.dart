@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +61,8 @@ class _AuthPageState extends State<AuthPage> {
         "password": password,
         "aadharorpan": aadharorpan
       });
+
+      print(jsonDecode(response.body)['response']);
     } catch (e) {
       print("Error is $e ");
     }
@@ -119,7 +122,7 @@ class _AuthPageState extends State<AuthPage> {
                       ),
                       fillColor: Colors.grey.shade200,
                       filled: true,
-                      hintText: 'Aadhar or Pan',
+                      hintText: 'Pan number',
                       hintStyle: TextStyle(
                         color: Colors.grey[500],
                       ),
