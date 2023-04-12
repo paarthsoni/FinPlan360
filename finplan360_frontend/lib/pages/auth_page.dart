@@ -5,39 +5,44 @@ import 'package:http/http.dart' as http;
 
 class AuthPage extends StatefulWidget {
   final String username;
-  final String fullname;
+  final String firstName;
+  final String lastName;
   final String password;
   final String dob;
 
   const AuthPage({
     Key? key,
     required this.username,
-    required this.fullname,
     required this.password,
     required this.dob,
+    required this.firstName,
+    required this.lastName,
   }) : super(key: key);
 
   @override
   State<AuthPage> createState() =>
-      _AuthPageState(username, fullname, password, dob);
+      _AuthPageState(username, firstName, lastName, password, dob);
 }
 
 class _AuthPageState extends State<AuthPage> {
   final String username;
-  final String fullname;
+  final String firstName;
+  final String lastName;
   final String password;
   final String dob;
 
   // text editing controllers
   final aadharorPanController = TextEditingController();
 
-  _AuthPageState(this.username, this.fullname, this.password, this.dob);
+  _AuthPageState(
+      this.username, this.firstName, this.lastName, this.password, this.dob);
 
   Future<String> _postdata({String aadharorpan = ""}) async {
     try {
       var response = await http
           .post(Uri.parse("http://10.0.2.2:8000/api/register"), body: {
-        "fullname": fullname,
+        "firstname": firstName,
+        "lastname": lastName,
         "dob": dob,
         "username": username,
         "password": password,

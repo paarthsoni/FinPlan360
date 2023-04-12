@@ -2,7 +2,19 @@ import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/pages/auth_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -13,7 +25,8 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   // text editing controllers
-  final fullnameController = TextEditingController();
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
   final dobController = TextEditingController();
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
@@ -66,11 +79,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(
                   height: 25,
                 ),
-
+                // first name
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25),
                   child: TextField(
-                    controller: fullnameController,
+                    controller: firstNameController,
+                    inputFormatters: [UpperCaseTextFormatter()],
                     obscureText: false,
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
@@ -90,7 +104,35 @@ class _RegisterPageState extends State<RegisterPage> {
                         color: Colors.grey[500],
                       ),
                     ),
-                    onSubmitted: (value) => fullnameController.text = value,
+                    onSubmitted: (value) => firstNameController.text = value,
+                  ),
+                ),
+                // last name
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: TextField(
+                    controller: lastNameController,
+                    inputFormatters: [UpperCaseTextFormatter()],
+                    obscureText: false,
+                    decoration: InputDecoration(
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.white,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.grey.shade400,
+                        ),
+                      ),
+                      fillColor: Colors.grey.shade200,
+                      filled: true,
+                      hintText: "Last Name",
+                      hintStyle: TextStyle(
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    onSubmitted: (value) => lastNameController.text = value,
                   ),
                 ),
 
@@ -253,17 +295,39 @@ class _RegisterPageState extends State<RegisterPage> {
                   onTap: () {
                     // login
                     try {} catch (e) {}
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AuthPage(
-                          fullname: fullnameController.text,
-                          username: usernameController.text,
-                          password: passwordController.text,
-                          dob: dobController.text,
+                    if (passwordController.text ==
+                        confirmpasswordController.text) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AuthPage(
+                            firstName: firstNameController.text,
+                            lastName: lastNameController.text,
+                            username: usernameController.text,
+                            password: passwordController.text,
+                            dob: dobController.text,
+                          ),
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Password does not match'),
+                        ),
+                      );
+                    }
+
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => AuthPage(
+                    //       firstName: firstNameController.text,
+                    //       lastName: lastNameController.text,
+                    //       username: usernameController.text,
+                    //       password: passwordController.text,
+                    //       dob: dobController.text,
+                    //     ),
+                    //   ),
                   },
                   text: 'Sign Up',
                 ),
