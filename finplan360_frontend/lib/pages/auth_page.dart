@@ -33,6 +33,23 @@ class _AuthPageState extends State<AuthPage> {
 
   _AuthPageState(this.username, this.fullname, this.password, this.dob);
 
+  Future<String> _postdata({String aadharorpan = ""}) async {
+    try {
+      var response = await http
+          .post(Uri.parse("http://10.0.2.2:8000/api/register"), body: {
+        "fullname": fullname,
+        "dob": dob,
+        "username": username,
+        "password": password,
+        "aadharorpan": aadharorpan
+      });
+    } catch (e) {
+      print("Error is $e ");
+    }
+
+    return "";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,16 +116,19 @@ class _AuthPageState extends State<AuthPage> {
 
                 //authenticate button
                 MyButton(
-                  onTap: () {
-                    // login
-                    try {} catch (e) {}
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                    );
+                  onTap: () async {
+                    _postdata(aadharorpan: aadharorPanController.text);
                   },
+                  // onTap: () {
+                  //   // login
+                  //   try {} catch (e) {}
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => const LoginPage(),
+                  //     ),
+                  //   );
+                  // },
                   text: 'Authenticate',
                 ),
 
