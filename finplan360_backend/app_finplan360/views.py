@@ -94,3 +94,12 @@ def userlogin(request):
             return JsonResponse({'response': 'invalid username or password'})
     else:
         return JsonResponse({'response': 'invalid username or password'})
+
+
+@csrf_exempt
+def userlogout(request):
+    username = request.POST.get('username')
+    useraccount.objects.filter(
+        username=username).update(is_authenticated='no')
+    print(username)
+    return JsonResponse({'response': 'logged out'})

@@ -4,6 +4,7 @@ import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
+import 'package:finplan360_frontend/pages/home_page.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -62,7 +63,23 @@ class _AuthPageState extends State<AuthPage> {
         "aadharorpan": aadharorpan
       });
 
-      print(jsonDecode(response.body)['response']);
+      var result = jsonDecode(response.body);
+      if (result['response'] == 'Account Created Sucessfully') {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoginPage()));
+      } else if (result['response'] == 'Invalid Pan number') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid Pan number!!'),
+          ),
+        );
+      } else if (result['response'] == 'Username already exists') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Username already exists'),
+          ),
+        );
+      }
     } catch (e) {
       print("Error is $e ");
     }

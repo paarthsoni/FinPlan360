@@ -26,7 +26,23 @@ class _LoginPageState extends State<LoginPage> {
         "password": passwordController.text,
       });
 
-      print(jsonDecode(response.body)['response']);
+      // print();
+
+      var result = jsonDecode(response.body);
+      print(result['response']);
+      if (result['response'] == 'logged in') {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    HomePage(username: usernameController.text)));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Invalid Username or Password!!'),
+          ),
+        );
+      }
     } catch (e) {
       print("Error is $e ");
     }
