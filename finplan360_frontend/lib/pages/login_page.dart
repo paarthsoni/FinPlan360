@@ -3,6 +3,7 @@ import 'package:finplan360_frontend/pages/home_page.dart';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -16,6 +17,22 @@ class _LoginPageState extends State<LoginPage> {
   final usernameController = TextEditingController();
 
   final passwordController = TextEditingController();
+
+  Future<String> _postlogindata() async {
+    try {
+      var response =
+          await http.post(Uri.parse("http://10.0.2.2:8000/api/login"), body: {
+        "username": usernameController.text,
+        "password": passwordController.text,
+      });
+
+      print(jsonDecode(response.body)['response']);
+    } catch (e) {
+      print("Error is $e ");
+    }
+
+    return "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,16 +150,19 @@ class _LoginPageState extends State<LoginPage> {
 
                 //login button
                 MyButton(
-                  onTap: () {
-                    // login
-                    try {} catch (e) {}
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(),
-                      ),
-                    );
+                  onTap: () async {
+                    _postlogindata();
                   },
+                  // onTap: () {
+                  //   // login
+                  //   try {} catch (e) {}
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => const HomePage(),
+                  //     ),
+                  //   );
+                  // },
                   text: 'Sign In',
                 ),
 
