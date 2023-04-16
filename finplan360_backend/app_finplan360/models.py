@@ -11,6 +11,7 @@ class useraccount(models.Model):
     panoraadhar = models.CharField(null=False, default="", max_length=12)
     acc_creation_date = models.DateTimeField(
         default=datetime.now(), blank=None, null=None)
+    is_authenticated = models.CharField(null=False, default="no", max_length=3)
 
     def __str__(self):
         return self.firstname + " " + self.lastname

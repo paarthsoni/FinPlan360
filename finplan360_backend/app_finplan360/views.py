@@ -6,6 +6,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import useraccount
 import requests
 from datetime import datetime
+import bcrypt
+from django.contrib.auth.hashers import make_password, check_password
 
 
 @csrf_exempt
@@ -15,7 +17,9 @@ def useraccountdetails(request):
     dob = request.POST.get("dob")
     username = request.POST.get("username")
     password = request.POST.get("password")
+    hashed_pwd = make_password(password)
     aadharorpan = request.POST.get("aadharorpan")
+
     print(firstname, lastname, dob, username, password, aadharorpan)
     flag = 0
     if (useraccount.objects.filter(username=username).exists()):
@@ -47,8 +51,11 @@ def useraccountdetails(request):
                 fname = response['result']['source_output']['first_name']
                 lname = response['result']['source_output']['last_name']
                 if firstname == fname and lastname == lname:
+                    bytepan = aadharorpan.encode('utf-8')
+                    mySalt = bcrypt.gensalt()
+                    hashedpan = bcrypt.hashpw(bytepan, mySalt)
                     userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username,
-                                           password=password, panoraadhar=aadharorpan, acc_creation_date=datetime.now())
+                                           password=hashed_pwd, panoraadhar=hashedpan, acc_creation_date=datetime.now())
                     userdata.save()
                     # print("matched")
                     return JsonResponse({'response': 'Account Created Sucessfully'})
@@ -62,3 +69,28 @@ def useraccountdetails(request):
             return JsonResponse({'response': 'Invalid Pan number'})
     elif flag == 1:
         return JsonResponse({'response': 'Username already exists'})
+
+
+@csrf_exempt
+def userlogin(request):
+    username = request.POST.get("username")
+    password = request.POST.get("password")
+    print(username, password)
+
+    if useraccount.objects.filter(username=username).exists():
+
+        user = useraccount.objects.get(username=username)
+        userpassword = user.password
+        result = check_password(password, userpassword)
+
+        if result == True:
+           # print("user logged in")
+            useraccount.objects.filter(
+                username=username).update(is_authenticated='yes')
+
+            return JsonResponse({'response': 'logged in'})
+
+        else:
+            return JsonResponse({'response': 'invalid username or password'})
+    else:
+        return JsonResponse({'response': 'invalid username or password'})

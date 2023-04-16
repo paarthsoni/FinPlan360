@@ -6,4 +6,5 @@ from app_finplan360 import views
 urlpatterns = [
 
     path('register', views.useraccountdetails, name="userdetails"),
+    path('login', views.userlogin, name="userlogin"),
 ]
