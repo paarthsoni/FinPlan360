@@ -1,4 +1,6 @@
 import 'package:finplan360_frontend/components/my_button.dart';
+import 'package:finplan360_frontend/constants/ip.dart';
+import 'package:finplan360_frontend/constants/routes.dart';
 import 'package:finplan360_frontend/pages/home_page.dart';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<String> _postlogindata() async {
     try {
       var response =
-          await http.post(Uri.parse("http://10.0.2.2:8000/api/login"), body: {
+          await http.post(Uri.parse("http://$hardikip/api/login"), body: {
         "username": usernameController.text,
         "password": passwordController.text,
       });
@@ -31,11 +33,7 @@ class _LoginPageState extends State<LoginPage> {
       var result = jsonDecode(response.body);
       print(result['response']);
       if (result['response'] == 'logged in') {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    HomePage(username: usernameController.text)));
+        //route to home page
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -168,6 +166,10 @@ class _LoginPageState extends State<LoginPage> {
                 MyButton(
                   onTap: () async {
                     _postlogindata();
+
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, homeRoute, (route) => false,
+                        arguments: usernameController.text);
                   },
                   // onTap: () {
                   //   // login
@@ -219,11 +221,8 @@ class _LoginPageState extends State<LoginPage> {
                     TextButton(
                       onPressed: () {
                         // register page
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterPage(),
-                          ),
+                        Navigator.of(context).pushNamed(
+                          registerRoute,
                         );
                       },
                       child: const Text('Register Now'),
