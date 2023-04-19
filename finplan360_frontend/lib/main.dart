@@ -18,7 +18,9 @@ void main() {
       // if not created then pass it to login page
       initialRoute: loginRoute,
       routes: {
-        loginRoute: (context) => LoginPage(),
+        loginRoute: (context) => LoginPage(
+              isFromAuthPage: false,
+            ),
         registerRoute: (context) => RegisterPage(),
       },
 

@@ -76,7 +76,11 @@ class _AuthPageState extends State<AuthPage> {
 
       if (result['response'] == 'Account Created Sucessfully') {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LoginPage()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => LoginPage(
+                      isFromAuthPage: true,
+                    )));
       } else if (result['response'] == 'Invalid Pan number') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

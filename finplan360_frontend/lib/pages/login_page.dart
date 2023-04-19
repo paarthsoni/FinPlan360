@@ -8,7 +8,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({Key? key}) : super(key: key);
+  final bool isFromAuthPage;
+  const LoginPage({Key? key, required this.isFromAuthPage}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -20,6 +21,24 @@ class _LoginPageState extends State<LoginPage> {
   final passwordController = TextEditingController();
 
   bool _isloading = false;
+
+  bool get isFromAuthPage => widget.isFromAuthPage;
+
+  @override
+  void initState() {
+    super.initState();
+    if (isFromAuthPage) {
+      WidgetsBinding.instance!.addPostFrameCallback(
+        (_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Account created successfully!'),
+            ),
+          );
+        },
+      );
+    }
+  }
 
   Future<String> _postlogindata(BuildContext context) async {
     try {
