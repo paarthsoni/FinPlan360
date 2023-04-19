@@ -50,6 +50,85 @@ class _RegisterPageState extends State<RegisterPage> {
     });
   }
 
+  bool _validateInputs() {
+    if (firstNameController.text.isEmpty) {
+      _showErrorDialog('First name is required');
+      return false;
+    }
+    // validate first name for only alphabets
+    if (!RegExp(r"^[a-zA-Z]+$").hasMatch(firstNameController.text)) {
+      _showErrorDialog('First name should contain only alphabets');
+      return false;
+    }
+    if (lastNameController.text.isEmpty) {
+      _showErrorDialog('Last name is required');
+      return false;
+    }
+    // validate last name for only alphabets
+    if (!RegExp(r"^[a-zA-Z]+$").hasMatch(lastNameController.text)) {
+      _showErrorDialog('Last name should contain only alphabets');
+      return false;
+    }
+    if (dobController.text.isEmpty) {
+      _showErrorDialog('Date of birth is required');
+      return false;
+    }
+    if (usernameController.text.isEmpty) {
+      _showErrorDialog('Username is required');
+      return false;
+    }
+    // validate username for only alphabets and numbers
+    if (!RegExp(r"^[a-zA-Z0-9]+$").hasMatch(usernameController.text)) {
+      _showErrorDialog('Username should contain only alphabets and numbers');
+      return false;
+    }
+    if (passwordController.text.isEmpty) {
+      _showErrorDialog('Password is required');
+      return false;
+    }
+    // validate password for minimum 8 characters at least 1 Alphabet and 1 Number and 1 Special Character and no whitespace allowed
+    if (!RegExp(
+            r"^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$")
+        .hasMatch(passwordController.text)) {
+      _showErrorDialog(
+          'Password should contain minimum 8 characters at least 1 Alphabet and 1 Number and 1 Special Character and no whitespace allowed');
+      return false;
+    }
+    if (confirmpasswordController.text.isEmpty) {
+      _showErrorDialog('Confirm password is required');
+      return false;
+    }
+    if (passwordController.text != confirmpasswordController.text) {
+      _showErrorDialog('Passwords do not match');
+      return false;
+    }
+    return true;
+  }
+
+  // show error dialog
+  void _showErrorDialog(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+    // showDialog(
+    //   context: context,
+    //   builder: (ctx) => AlertDialog(
+    //     title: const Text('Error'),
+    //     content: Text(message),
+    //     actions: [
+    //       TextButton(
+    //         onPressed: () {
+    //           Navigator.of(ctx).pop();
+    //         },
+    //         child: const Text('OK'),
+    //       ),
+    //     ],
+    //   ),
+    // );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,23 +352,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
 
-                // const SizedBox(
-                //   height: 10,
-                // ),
-
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 25),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.end,
-                //     children: [
-                //       Text(
-                //         'Forgot Password?',
-                //         style: TextStyle(color: Colors.grey[600]),
-                //       ),
-                //     ],
-                //   ),
-                // ),
-
                 const SizedBox(
                   height: 25,
                 ),
@@ -299,72 +361,33 @@ class _RegisterPageState extends State<RegisterPage> {
                   onTap: () {
                     // login
                     try {} catch (e) {}
-                    if (passwordController.text ==
-                        confirmpasswordController.text) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AuthPage(
-                            firstName: firstNameController.text,
-                            lastName: lastNameController.text,
-                            username: usernameController.text,
-                            dob: dobController.text,
-                            password: passwordController.text,
-                          ),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Password does not match'),
-                        ),
-                      );
+                    if (!_validateInputs()) {
+                      return;
                     }
-
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => AuthPage(
-                    //       firstName: firstNameController.text,
-                    //       lastName: lastNameController.text,
-                    //       username: usernameController.text,
-                    //       password: passwordController.text,
-                    //       dob: dobController.text,
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AuthPage(
+                          firstName: firstNameController.text,
+                          lastName: lastNameController.text,
+                          username: usernameController.text,
+                          dob: dobController.text,
+                          password: passwordController.text,
+                        ),
+                      ),
+                    );
+                    // }
+                    // else {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text('Password does not match'),
                     //     ),
-                    //   ),
+                    //   );
+                    // }
                   },
                   text: 'Sign Up',
+                  isloading: false,
                 ),
-
-                // Google sign in ???
-                // const SizedBox(
-                //   height: 50,
-                // ),
-
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 25),
-                //   child: Row(
-                //     children: [
-                //       Expanded(
-                //           child: Divider(
-                //         color: Colors.grey[400],
-                //         thickness: 0.7,
-                //       )),
-                //       Padding(
-                //         padding: const EdgeInsets.symmetric(horizontal: 10),
-                //         child: Text(
-                //           'Or Continue With',
-                //           style: TextStyle(color: Colors.grey[700]),
-                //         ),
-                //       ),
-                //       Expanded(
-                //           child: Divider(
-                //         color: Colors.grey[400],
-                //         thickness: 0.7,
-                //       )),
-                //     ],
-                //   ),
-                // ),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

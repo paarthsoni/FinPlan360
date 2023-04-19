@@ -49,13 +49,19 @@ class _AuthPageState extends State<AuthPage> {
   // text editing controllers
   final aadharorPanController = TextEditingController();
 
+  bool _isloading = false;
+
   _AuthPageState(
       this.username, this.firstName, this.lastName, this.password, this.dob);
 
   Future<String> _postdata({String aadharorpan = ""}) async {
     try {
+      setState(() {
+        _isloading = true;
+      });
+
       var response =
-          await http.post(Uri.parse("http://$paarthip/api/register"), body: {
+          await http.post(Uri.parse("http://$hardikip/api/register"), body: {
         "firstname": firstName,
         "lastname": lastName,
         "dob": dob,
@@ -86,6 +92,10 @@ class _AuthPageState extends State<AuthPage> {
       }
     } catch (e) {
       print("Error is $e ");
+    } finally {
+      setState(() {
+        _isloading = false;
+      });
     }
 
     return "";
@@ -161,17 +171,8 @@ class _AuthPageState extends State<AuthPage> {
                   onTap: () async {
                     _postdata(aadharorpan: aadharorPanController.text);
                   },
-                  // onTap: () {
-                  //   // login
-                  //   try {} catch (e) {}
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => const LoginPage(),
-                  //     ),
-                  //   );
-                  // },
                   text: 'Authenticate',
+                  isloading: _isloading,
                 ),
 
                 // Google sign in ???

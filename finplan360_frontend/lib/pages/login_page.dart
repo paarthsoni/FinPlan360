@@ -17,13 +17,18 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   // text editing controllers
   final usernameController = TextEditingController();
-
   final passwordController = TextEditingController();
 
-  Future<String> _postlogindata() async {
+  bool _isloading = false;
+
+  Future<String> _postlogindata(BuildContext context) async {
     try {
+      setState(() {
+        _isloading = true;
+      });
+
       var response =
-          await http.post(Uri.parse("http://$paarthip/api/login"), body: {
+          await http.post(Uri.parse("http://$hardikip/api/login"), body: {
         "username": usernameController.text,
         "password": passwordController.text,
       });
@@ -44,6 +49,10 @@ class _LoginPageState extends State<LoginPage> {
       }
     } catch (e) {
       print("Error is $e ");
+    } finally {
+      setState(() {
+        _isloading = false;
+      });
     }
 
     return "";
@@ -166,54 +175,11 @@ class _LoginPageState extends State<LoginPage> {
                 //login button
                 MyButton(
                   onTap: () async {
-                    _postlogindata();
-
-                    // Navigator.pushNamedAndRemoveUntil(
-                    //     context, homeRoute, (route) => false,
-                    //     arguments: usernameController.text);
+                    _postlogindata(context);
                   },
-                  // onTap: () {
-                  //   // login
-                  //   try {} catch (e) {}
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => const HomePage(),
-                  //     ),
-                  //   );
-                  // },
                   text: 'Sign In',
+                  isloading: _isloading,
                 ),
-
-                // Google sign in ???
-                // const SizedBox(
-                //   height: 50,
-                // ),
-
-                // Padding(
-                //   padding: const EdgeInsets.symmetric(horizontal: 25),
-                //   child: Row(
-                //     children: [
-                //       Expanded(
-                //           child: Divider(
-                //         color: Colors.grey[400],
-                //         thickness: 0.7,
-                //       )),
-                //       Padding(
-                //         padding: const EdgeInsets.symmetric(horizontal: 10),
-                //         child: Text(
-                //           'Or Continue With',
-                //           style: TextStyle(color: Colors.grey[700]),
-                //         ),
-                //       ),
-                //       Expanded(
-                //           child: Divider(
-                //         color: Colors.grey[400],
-                //         thickness: 0.7,
-                //       )),
-                //     ],
-                //   ),
-                // ),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

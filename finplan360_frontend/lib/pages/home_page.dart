@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<String> _logoutuser() async {
     try {
-      var response = await http.post(Uri.parse("http://$paarthip/api/logout"),
+      var response = await http.post(Uri.parse("http://$hardikip/api/logout"),
           body: {'username': widget.username});
 
       var result = jsonDecode(response.body);
