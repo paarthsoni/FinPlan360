@@ -55,7 +55,7 @@ class _AuthPageState extends State<AuthPage> {
   Future<String> _postdata({String aadharorpan = ""}) async {
     try {
       var response =
-          await http.post(Uri.parse("http://$localip/api/register"), body: {
+          await http.post(Uri.parse("http://$paarthip/api/register"), body: {
         "firstname": firstName,
         "lastname": lastName,
         "dob": dob,
@@ -65,6 +65,9 @@ class _AuthPageState extends State<AuthPage> {
       });
 
       var result = jsonDecode(response.body);
+
+      print(result);
+
       if (result['response'] == 'Account Created Sucessfully') {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => LoginPage()));

@@ -37,14 +37,14 @@ def useraccountdetails(request):
             }
             headers = {
                 "content-type": "application/json",
-                "X-RapidAPI-Key": "30958d0e79mshbf7479782f1df77p141c9ajsnc300431445bf",
+                "X-RapidAPI-Key": "1ba039b9dbmsh24028dac9b2690bp191d6ejsnfb265c824e91",
                 "X-RapidAPI-Host": "pan-card-verification1.p.rapidapi.com"
             }
 
             response = requests.request(
                 "POST", url, json=payload, headers=headers)
 
-            # print(response.text)
+            print(response.text)
             response = response.json()
 
             if 'result' in response:

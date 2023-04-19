@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<String> _postlogindata() async {
     try {
       var response =
-          await http.post(Uri.parse("http://$localip/api/login"), body: {
+          await http.post(Uri.parse("http://$paarthip/api/login"), body: {
         "username": usernameController.text,
         "password": passwordController.text,
       });
