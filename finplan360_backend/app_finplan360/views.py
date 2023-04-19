@@ -84,15 +84,17 @@ def userlogin(request):
         result = check_password(password, userpassword)
 
         if result == True:
-           # print("user logged in")
+            print("user logged in")
             useraccount.objects.filter(
                 username=username).update(is_authenticated='yes')
 
             return JsonResponse({'response': 'logged in'})
 
         else:
+            print("invalid username or password")
             return JsonResponse({'response': 'invalid username or password'})
     else:
+        print("invalid username or password")
         return JsonResponse({'response': 'invalid username or password'})
 
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:finplan360_frontend/pages/home_page.dart';
+import 'package:finplan360_frontend/constants/ip.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -53,8 +54,8 @@ class _AuthPageState extends State<AuthPage> {
 
   Future<String> _postdata({String aadharorpan = ""}) async {
     try {
-      var response = await http
-          .post(Uri.parse("http://10.0.2.2:8000/api/register"), body: {
+      var response =
+          await http.post(Uri.parse("http://$localip/api/register"), body: {
         "firstname": firstName,
         "lastname": lastName,
         "dob": dob,

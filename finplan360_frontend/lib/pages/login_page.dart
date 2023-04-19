@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<String> _postlogindata() async {
     try {
       var response =
-          await http.post(Uri.parse("http://$hardikip/api/login"), body: {
+          await http.post(Uri.parse("http://$localip/api/login"), body: {
         "username": usernameController.text,
         "password": passwordController.text,
       });
@@ -33,7 +33,8 @@ class _LoginPageState extends State<LoginPage> {
       var result = jsonDecode(response.body);
       print(result['response']);
       if (result['response'] == 'logged in') {
-        //route to home page
+        Navigator.pushNamedAndRemoveUntil(context, homeRoute, (route) => false,
+            arguments: usernameController.text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -167,9 +168,9 @@ class _LoginPageState extends State<LoginPage> {
                   onTap: () async {
                     _postlogindata();
 
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, homeRoute, (route) => false,
-                        arguments: usernameController.text);
+                    // Navigator.pushNamedAndRemoveUntil(
+                    //     context, homeRoute, (route) => false,
+                    //     arguments: usernameController.text);
                   },
                   // onTap: () {
                   //   // login
