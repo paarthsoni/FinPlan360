@@ -401,7 +401,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           MaterialPageRoute(
                             builder: (context) => const LoginPage(
                               isFromAuthPage: false,
-                              isFromHomePage: false,
+                              isFromSalaryPage: false,
                             ),
                           ),
                         );

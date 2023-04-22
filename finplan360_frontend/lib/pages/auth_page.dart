@@ -4,7 +4,7 @@ import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
-import 'package:finplan360_frontend/pages/home_page.dart';
+import 'package:finplan360_frontend/pages/salary_page.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
@@ -61,7 +61,7 @@ class _AuthPageState extends State<AuthPage> {
       });
 
       var response =
-          await http.post(Uri.parse("http://$paarthip/api/register"), body: {
+          await http.post(Uri.parse("http://$ip/api/register"), body: {
         "firstname": firstName,
         "lastname": lastName,
         "dob": dob,
@@ -80,7 +80,7 @@ class _AuthPageState extends State<AuthPage> {
             MaterialPageRoute(
                 builder: (context) => LoginPage(
                       isFromAuthPage: true,
-                      isFromHomePage: false,
+                      isFromSalaryPage: false,
                     )));
       } else if (result['response'] == 'Invalid Pan number') {
         ScaffoldMessenger.of(context).showSnackBar(

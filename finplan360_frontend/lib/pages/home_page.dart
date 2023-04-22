@@ -1,3 +1,4 @@
+import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
 import 'package:finplan360_frontend/constants/routes.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
@@ -22,9 +23,21 @@ class _HomePageState extends State<HomePage> {
   final String username;
   _HomePageState(this.username);
 
+  // text editing controllers
+
+  bool _isloading = false;
+
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   Future<String> _logoutuser() async {
     try {
-      var response = await http.post(Uri.parse("http://$paarthip/api/logout"),
+      var response = await http.post(Uri.parse("http://$ip/api/logout"),
           body: {'username': widget.username});
 
       var result = jsonDecode(response.body);
@@ -37,7 +50,7 @@ class _HomePageState extends State<HomePage> {
             MaterialPageRoute(
                 builder: (context) => LoginPage(
                       isFromAuthPage: false,
-                      isFromHomePage: true,
+                      isFromSalaryPage: true,
                     )),
             (route) => false);
       }
@@ -52,26 +65,47 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('FinPlan360'),
+        backgroundColor: Colors.black,
         actions: [
           IconButton(
             onPressed: () async {
               _logoutuser();
             },
-            // () {
-            //   // logout
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => LoginPage(),
-            //     ),
-            //   );
-            // },
             icon: const Icon(Icons.logout),
           ),
         ],
       ),
-      body: Center(
-        child: Text('Home Page Welcome $username'),
+      body: SafeArea(
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: <Widget>[
+            // First item content
+            Center(
+              child: Text('Pie Chart Content'),
+            ),
+            // Second item content
+            Center(
+              child: Text('Bar Chart Content'),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.pie_chart),
+            label: 'Pie Chart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Bar Chart',
+          ),
+        ],
       ),
     );
   }

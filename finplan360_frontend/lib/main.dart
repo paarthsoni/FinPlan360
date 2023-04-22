@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:finplan360_frontend/constants/globals.dart' as globals;
 import 'package:finplan360_frontend/constants/routes.dart';
 import 'package:finplan360_frontend/pages/home_page.dart';
+import 'package:finplan360_frontend/pages/salary_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +17,7 @@ void main() async {
   Map<String, dynamic> myMap = {};
   print(username);
   if (username != 'null') {
-    var response = await http.post(
-        Uri.parse("http://$paarthip/api/is_authenticated"),
+    var response = await http.post(Uri.parse("http://$ip/api/is_authenticated"),
         body: {'username': username});
 
     print(response.body);
@@ -28,11 +28,6 @@ void main() async {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
-      // home: LoginPage(),
-      // routes: {
-      //   '/login/': (context) => LoginPage(),
-      //   '/register/': (context) => RegisterPage(),
-      // },
 
       // check if username is created or not, if created then pass it to home page
       // if not created then pass it to login page
@@ -41,13 +36,18 @@ void main() async {
       routes: {
         loginRoute: (context) => LoginPage(
               isFromAuthPage: false,
-              isFromHomePage: false,
+              isFromSalaryPage: false,
             ),
         registerRoute: (context) => RegisterPage(),
       },
 
       onGenerateRoute: (settings) {
-        if (settings.name == homeRoute) {
+        if (settings.name == salaryRoute) {
+          final args = settings.arguments as String;
+          return MaterialPageRoute(
+            builder: (context) => SalaryPage(username: args),
+          );
+        } else if (settings.name == homeRoute) {
           final args = settings.arguments as String;
           return MaterialPageRoute(
             builder: (context) => HomePage(username: args),

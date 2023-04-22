@@ -1,7 +1,7 @@
 import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
 import 'package:finplan360_frontend/constants/routes.dart';
-import 'package:finplan360_frontend/pages/home_page.dart';
+import 'package:finplan360_frontend/pages/salary_page.dart';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -11,9 +11,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   final bool isFromAuthPage;
-  final bool isFromHomePage;
+  final bool isFromSalaryPage;
   const LoginPage(
-      {Key? key, required this.isFromAuthPage, required this.isFromHomePage})
+      {Key? key, required this.isFromAuthPage, required this.isFromSalaryPage})
       : super(key: key);
 
   @override
@@ -28,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isloading = false;
 
   bool get isFromAuthPage => widget.isFromAuthPage;
-  bool get isFromHomePage => widget.isFromHomePage;
+  bool get isFromSalaryPage => widget.isFromSalaryPage;
 
   @override
   void initState() {
@@ -43,8 +43,8 @@ class _LoginPageState extends State<LoginPage> {
           );
         },
       );
-    } else if (isFromHomePage) {
-      WidgetsBinding.instance!.addPostFrameCallback(
+    } else if (isFromSalaryPage) {
+      WidgetsBinding.instance.addPostFrameCallback(
         (_) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -62,8 +62,7 @@ class _LoginPageState extends State<LoginPage> {
         _isloading = true;
       });
 
-      var response =
-          await http.post(Uri.parse("http://$paarthip/api/login"), body: {
+      var response = await http.post(Uri.parse("http://$ip/api/login"), body: {
         "username": usernameController.text,
         "password": passwordController.text,
       });
@@ -73,7 +72,8 @@ class _LoginPageState extends State<LoginPage> {
       var result = jsonDecode(response.body);
       print(result['response']);
       if (result['response'] == 'logged in') {
-        Navigator.pushNamedAndRemoveUntil(context, homeRoute, (route) => false,
+        Navigator.pushNamedAndRemoveUntil(
+            context, salaryRoute, (route) => false,
             arguments: usernameController.text);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('username', usernameController.text);
