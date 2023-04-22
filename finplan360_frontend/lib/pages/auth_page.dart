@@ -61,7 +61,7 @@ class _AuthPageState extends State<AuthPage> {
       });
 
       var response =
-          await http.post(Uri.parse("http://$hardikip/api/register"), body: {
+          await http.post(Uri.parse("http://$paarthip/api/register"), body: {
         "firstname": firstName,
         "lastname": lastName,
         "dob": dob,
@@ -80,6 +80,7 @@ class _AuthPageState extends State<AuthPage> {
             MaterialPageRoute(
                 builder: (context) => LoginPage(
                       isFromAuthPage: true,
+                      isFromHomePage: false,
                     )));
       } else if (result['response'] == 'Invalid Pan number') {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,6 +92,13 @@ class _AuthPageState extends State<AuthPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Username already exists'),
+          ),
+        );
+      } else if (result['response'] == 'Pan exists') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Account Associated with this Pan number already exists!!'),
           ),
         );
       }

@@ -1,13 +1,15 @@
-import json
+
 from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
 from app_finplan360 import urls
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
 from .models import useraccount
 import requests
 from datetime import datetime
-import bcrypt
+
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth import authenticate, login, logout
 
 
 @csrf_exempt
@@ -22,10 +24,19 @@ def useraccountdetails(request):
 
     print(firstname, lastname, dob, username, password, aadharorpan)
     flag = 0
+
     if (useraccount.objects.filter(username=username).exists()):
         flag = 1
 
-    if flag != 1:
+    resultpan = False
+    for e in useraccount.objects.all():
+        result = check_password(aadharorpan, e.panoraadhar)
+        if result == True:
+            resultpan = True
+            break
+
+    print(resultpan)
+    if flag != 1 and resultpan == False:
         if len(aadharorpan) == 10:
 
             url = "https://pan-card-verification1.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan"
@@ -51,11 +62,12 @@ def useraccountdetails(request):
                 fname = response['result']['source_output']['first_name']
                 lname = response['result']['source_output']['last_name']
                 if firstname == fname and lastname == lname:
-                    bytepan = aadharorpan.encode('utf-8')
-                    mySalt = bcrypt.gensalt()
-                    hashedpan = bcrypt.hashpw(bytepan, mySalt)
+
+                    user = User.objects.create_user(
+                        username=username, password=password)
                     userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username,
-                                           password=hashed_pwd, panoraadhar=hashedpan, acc_creation_date=datetime.now())
+                                           password=hashed_pwd, panoraadhar=make_password(aadharorpan), acc_creation_date=datetime.now())
+                    user.save()
                     userdata.save()
                     # print("matched")
                     return JsonResponse({'response': 'Account Created Sucessfully'})
@@ -70,6 +82,11 @@ def useraccountdetails(request):
     elif flag == 1:
         return JsonResponse({'response': 'Username already exists'})
 
+    elif resultpan == True:
+        return JsonResponse({'response': 'Pan exists'})
+
+    # return HttpResponse('v')
+
 
 @csrf_exempt
 def userlogin(request):
@@ -77,22 +94,15 @@ def userlogin(request):
     password = request.POST.get("password")
     print(username, password)
 
-    if useraccount.objects.filter(username=username).exists():
+    user = authenticate(username=username, password=password)
 
-        user = useraccount.objects.get(username=username)
-        userpassword = user.password
-        result = check_password(password, userpassword)
+    if user is not None:
+        print("user logged in")
+        useraccount.objects.filter(
+            username=username).update(is_authenticated='yes')
 
-        if result == True:
-            print("user logged in")
-            useraccount.objects.filter(
-                username=username).update(is_authenticated='yes')
+        return JsonResponse({'response': 'logged in'})
 
-            return JsonResponse({'response': 'logged in'})
-
-        else:
-            print("invalid username or password")
-            return JsonResponse({'response': 'invalid username or password'})
     else:
         print("invalid username or password")
         return JsonResponse({'response': 'invalid username or password'})
@@ -101,7 +111,16 @@ def userlogin(request):
 @csrf_exempt
 def userlogout(request):
     username = request.POST.get('username')
+    logout(request)
     useraccount.objects.filter(
         username=username).update(is_authenticated='no')
     print(username)
     return JsonResponse({'response': 'logged out'})
+
+
+@csrf_exempt
+def isauthenticated(request):
+    username=request.POST.get('username')
+    print(username)
+
+    return HttpResponse('d')

@@ -3,8 +3,20 @@ import 'package:finplan360_frontend/pages/home_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:finplan360_frontend/constants/ip.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // var username = prefs.getString('username') ?? 'null';
+  // print(username);
+  // if (username != 'null') {
+  //   var response = await http.post(
+  //       Uri.parse("http://$paarthip/api/is_authenticated"),
+  //       body: {'username': username});
+  // }
+
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -16,10 +28,12 @@ void main() {
 
       // check if username is created or not, if created then pass it to home page
       // if not created then pass it to login page
+
       initialRoute: loginRoute,
       routes: {
         loginRoute: (context) => LoginPage(
               isFromAuthPage: false,
+              isFromHomePage: false,
             ),
         registerRoute: (context) => RegisterPage(),
       },

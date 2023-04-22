@@ -24,7 +24,7 @@ class _HomePageState extends State<HomePage> {
 
   Future<String> _logoutuser() async {
     try {
-      var response = await http.post(Uri.parse("http://$hardikip/api/logout"),
+      var response = await http.post(Uri.parse("http://$paarthip/api/logout"),
           body: {'username': widget.username});
 
       var result = jsonDecode(response.body);
@@ -32,8 +32,14 @@ class _HomePageState extends State<HomePage> {
 
       if (result['response'] == 'logged out') {
         //route to login page
-        Navigator.pushNamedAndRemoveUntil(
-            context, loginRoute, (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => LoginPage(
+                      isFromAuthPage: false,
+                      isFromHomePage: true,
+                    )),
+            (route) => false);
       }
     } catch (e) {
       print("Error is $e ");

@@ -7,9 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class LoginPage extends StatefulWidget {
   final bool isFromAuthPage;
-  const LoginPage({Key? key, required this.isFromAuthPage}) : super(key: key);
+  final bool isFromHomePage;
+  const LoginPage(
+      {Key? key, required this.isFromAuthPage, required this.isFromHomePage})
+      : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -23,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _isloading = false;
 
   bool get isFromAuthPage => widget.isFromAuthPage;
+  bool get isFromHomePage => widget.isFromHomePage;
 
   @override
   void initState() {
@@ -37,6 +43,16 @@ class _LoginPageState extends State<LoginPage> {
           );
         },
       );
+    } else if (isFromHomePage) {
+      WidgetsBinding.instance!.addPostFrameCallback(
+        (_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Logged Out successfully!'),
+            ),
+          );
+        },
+      );
     }
   }
 
@@ -47,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       var response =
-          await http.post(Uri.parse("http://$hardikip/api/login"), body: {
+          await http.post(Uri.parse("http://$paarthip/api/login"), body: {
         "username": usernameController.text,
         "password": passwordController.text,
       });
@@ -59,6 +75,8 @@ class _LoginPageState extends State<LoginPage> {
       if (result['response'] == 'logged in') {
         Navigator.pushNamedAndRemoveUntil(context, homeRoute, (route) => false,
             arguments: usernameController.text);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('username', usernameController.text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
