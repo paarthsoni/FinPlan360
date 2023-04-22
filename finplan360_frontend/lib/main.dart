@@ -53,6 +53,18 @@ void main() async {
             builder: (context) => HomePage(username: args),
           );
         }
+        // if (settings.name == authRoute) {
+        //   final args = settings.arguments as Map<String, dynamic>;
+        //   if (args['response'] == true) {
+        //     return MaterialPageRoute(
+        //       builder: (context) => HomePage(username: args['username']),
+        //     );
+        //   } else {
+        //     return MaterialPageRoute(
+        //       builder: (context) => SalaryPage(username: args['username']),
+        //     );
+        //   }
+        // }
       },
     ),
   );

@@ -34,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     if (isFromAuthPage) {
-      WidgetsBinding.instance!.addPostFrameCallback(
+      WidgetsBinding.instance.addPostFrameCallback(
         (_) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -73,8 +73,11 @@ class _LoginPageState extends State<LoginPage> {
       print(result['response']);
       if (result['response'] == 'logged in') {
         Navigator.pushNamedAndRemoveUntil(
-            context, salaryRoute, (route) => false,
-            arguments: usernameController.text);
+          context,
+          salaryRoute,
+          (route) => false,
+          arguments: usernameController.text,
+        );
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('username', usernameController.text);
       } else {

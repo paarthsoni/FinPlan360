@@ -7,6 +7,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -28,6 +30,27 @@ class _HomePageState extends State<HomePage> {
   bool _isloading = false;
 
   int _selectedIndex = 0;
+  PermissionStatus _permissionStatus = PermissionStatus.denied;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPermission();
+  }
+
+  Future<void> _checkPermission() async {
+    final permissionStatus = await Permission.sms.status;
+    setState(() {
+      _permissionStatus = permissionStatus;
+    });
+  }
+
+  Future<void> _requestPermission() async {
+    final permissionStatus = await Permission.sms.request();
+    setState(() {
+      _permissionStatus = permissionStatus;
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -60,6 +83,28 @@ class _HomePageState extends State<HomePage> {
     return "";
   }
 
+  Future<void> _readMessages() async {
+    if (_permissionStatus != PermissionStatus.granted) {
+      await _requestPermission();
+    }
+
+    List<SmsMessage> messages = await SmsQuery().getAllSms;
+    for (var message in messages) {
+      print('Sender: ${message.address}   Message: ${message.body}');
+    }
+    // for (var message in messages) {
+    //   var response = await http.post(
+    //     Uri.parse("http://$ip/api/messages"),
+    //     body: {
+    //       'from': message.address,
+    //       'body': message.body,
+    //       'date': message.date.toString(),
+    //     },
+    //   );
+    //   print(response.body);
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,6 +112,12 @@ class _HomePageState extends State<HomePage> {
         title: const Text('FinPlan360'),
         backgroundColor: Colors.black,
         actions: [
+          IconButton(
+            onPressed: () async {
+              _readMessages();
+            },
+            icon: const Icon(Icons.message),
+          ),
           IconButton(
             onPressed: () async {
               _logoutuser();
