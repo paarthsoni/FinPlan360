@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:finplan360_frontend/constants/globals.dart' as globals;
 import 'package:finplan360_frontend/constants/routes.dart';
 import 'package:finplan360_frontend/pages/home_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
@@ -8,14 +10,20 @@ import 'package:finplan360_frontend/constants/ip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
-  // SharedPreferences prefs = await SharedPreferences.getInstance();
-  // var username = prefs.getString('username') ?? 'null';
-  // print(username);
-  // if (username != 'null') {
-  //   var response = await http.post(
-  //       Uri.parse("http://$paarthip/api/is_authenticated"),
-  //       body: {'username': username});
-  // }
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  var username = prefs.getString('username') ?? 'null';
+  Map<String, dynamic> myMap = {};
+  print(username);
+  if (username != 'null') {
+    var response = await http.post(
+        Uri.parse("http://$paarthip/api/is_authenticated"),
+        body: {'username': username});
+
+    print(response.body);
+    myMap = json.decode(response.body);
+    print(myMap['response']);
+  }
 
   runApp(
     MaterialApp(

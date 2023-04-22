@@ -120,7 +120,10 @@ def userlogout(request):
 
 @csrf_exempt
 def isauthenticated(request):
-    username=request.POST.get('username')
+    username = request.POST.get('username')
     print(username)
-
-    return HttpResponse('d')
+    user = useraccount.objects.filter(username=username).get()
+    if user.is_authenticated == 'yes':
+        return JsonResponse({'response': 'authenticated'})
+    else:
+        return JsonResponse({'response': 'not authenticated'})
