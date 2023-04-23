@@ -15,3 +15,11 @@ class useraccount(models.Model):
 
     def __str__(self):
         return self.firstname + " " + self.lastname
+
+
+class usersalary(models.Model):
+    username = models.CharField(null=False, unique=True, max_length=1024)
+    salary = models.IntegerField(null=False, default=0)
+
+    def __str__(self):
+        return self.username

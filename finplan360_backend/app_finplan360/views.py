@@ -4,7 +4,7 @@ from django.shortcuts import render, HttpResponse
 from app_finplan360 import urls
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
-from .models import useraccount
+from .models import *
 import requests
 from datetime import datetime
 
@@ -127,3 +127,21 @@ def isauthenticated(request):
         return JsonResponse({'response': 'authenticated'})
     else:
         return JsonResponse({'response': 'not authenticated'})
+
+
+@csrf_exempt
+def add_salary(request):
+    username = request.POST.get('username')
+    salary = request.POST.get('salary')
+
+    print(username, salary)
+
+    salary_check = salary.isnumeric()
+
+    if salary_check == True:
+        addsalary = usersalary(username=username, salary=salary)
+        addsalary.save()
+        return JsonResponse({'response': 'salary added'})
+
+    else:
+        return JsonResponse({'response': 'Invalid Salary'})

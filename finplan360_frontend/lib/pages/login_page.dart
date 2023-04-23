@@ -71,7 +71,12 @@ class _LoginPageState extends State<LoginPage> {
 
       var result = jsonDecode(response.body);
       print(result['response']);
-      if (result['response'] == 'logged in') {
+
+      WidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences login = await SharedPreferences.getInstance();
+      var firstlogin = login.getBool('firstTimeLogin') ?? false;
+      print(firstlogin);
+      if (result['response'] == 'logged in' && firstlogin == true) {
         Navigator.pushNamedAndRemoveUntil(
           context,
           salaryRoute,
@@ -80,6 +85,16 @@ class _LoginPageState extends State<LoginPage> {
         );
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('username', usernameController.text);
+
+        SharedPreferences login = await SharedPreferences.getInstance();
+        login.setBool('firstTimeLogin', false);
+      } else if (result['response'] == 'logged in' && firstlogin == false) {
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          homeRoute,
+          (route) => false,
+          arguments: usernameController.text,
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

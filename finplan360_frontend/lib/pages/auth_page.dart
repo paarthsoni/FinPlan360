@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:finplan360_frontend/pages/salary_page.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -75,6 +76,8 @@ class _AuthPageState extends State<AuthPage> {
       print(result);
 
       if (result['response'] == 'Account Created Sucessfully') {
+        SharedPreferences login = await SharedPreferences.getInstance();
+        login.setBool('firstTimeLogin', true);
         Navigator.push(
             context,
             MaterialPageRoute(

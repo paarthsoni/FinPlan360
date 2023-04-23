@@ -113,25 +113,25 @@ class _SalaryPageState extends State<SalaryPage> {
                   height: 25,
                 ),
                 MyButton(
-                  onTap: () {
-                    // try {
-                    // var response = await http
-                    //     .post(Uri.parse("http://$ip/api/salary"), body: {
-                    //   'username': widget.username,
-                    //   'salary': _salaryController.text,
-                    // });
+                  onTap: () async {
+                    try {
+                      var response = await http
+                          .post(Uri.parse("http://$ip/api/salary"), body: {
+                        'username': widget.username,
+                        'salary': _salaryController.text,
+                      });
 
-                    // var result = jsonDecode(response.body);
-                    // print(result['response']);
+                      var result = jsonDecode(response.body);
+                      print(result['response']);
 
-                    // if (result['response'] == 'salary added') {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, homeRoute, (route) => false,
-                        arguments: widget.username);
-                    // }
-                    // } catch (e) {
-                    // print("Error is $e ");
-                    // }
+                      if (result['response'] == 'salary added') {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, homeRoute, (route) => false,
+                            arguments: widget.username);
+                      }
+                    } catch (e) {
+                      print("Error is $e ");
+                    }
                   },
                   isloading: _isloading,
                   text: 'Next',

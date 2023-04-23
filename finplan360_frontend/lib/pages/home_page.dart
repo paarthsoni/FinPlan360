@@ -9,6 +9,7 @@ import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_sms_inbox/flutter_sms_inbox.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   final String username;
@@ -36,6 +37,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _checkPermission();
+    _readMessages();
   }
 
   Future<void> _checkPermission() async {
@@ -88,10 +90,63 @@ class _HomePageState extends State<HomePage> {
       await _requestPermission();
     }
 
-    List<SmsMessage> messages = await SmsQuery().getAllSms;
-    for (var message in messages) {
-      print('Sender: ${message.address}   Message: ${message.body}');
+    final messages = await SmsQuery().getAllSms;
+
+    List<SmsMessage> filteredMessagesdebit = messages
+        .where((message) =>
+            message.body!.contains('debited from a/c') ||
+            message.body!.contains('Sent INR'))
+        .toList();
+
+    for (var message in filteredMessagesdebit) {
+      // print('Sender: ${message.address}   Message: ${message.body}');
+
+      String? messageBody = message.body;
+
+      RegExp regexamount = RegExp(r'(?:Rs|INR)\s*(\d+(?:\.\d{2})?)');
+
+      RegExpMatch? matchamount = regexamount.firstMatch(messageBody!);
+
+      // RegExp regexdate = RegExp(
+      //     r"\b(0?[1-9]|[12][0-9]|3[01])([-/])(0?[1-9]|1[012])\2(\d{2}|\d{4})\b|\b(0?[1-9]|[12][0-9]|3[01])(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\d{2})\b");
+
+      // RegExpMatch? matchdate = regexdate.firstMatch(messageBody);
+
+      String startWord = "on ";
+      String endWord = " t";
+      String desiredText = "";
+      int startIndex = messageBody.indexOf(startWord);
+      if (startIndex != -1) {
+        startIndex += startWord.length;
+        int endIndex = messageBody.indexOf(endWord, startIndex);
+        if (endIndex != -1) {
+          desiredText = messageBody.substring(startIndex, endIndex).trim();
+        }
+      }
+
+      String startWord1 = "to ";
+      String endWord1 = ".";
+      String desiredText1 = "";
+      int startIndex1 = messageBody.indexOf(startWord1);
+      if (startIndex1 != -1) {
+        startIndex1 += startWord1.length;
+        int endIndex1 = messageBody.indexOf(endWord1, startIndex1);
+        if (endIndex1 != -1) {
+          desiredText1 = messageBody.substring(startIndex1, endIndex1).trim();
+        }
+      }
+
+      if (matchamount != null) {
+        String? debitedAmount = matchamount.group(1);
+
+        print('Debited amount: $debitedAmount');
+        print('Date on which amount Debited : ' + desiredText);
+        print('Vpa: ' + desiredText1);
+      } else {
+        print('No debited amount found in message.');
+      }
     }
+
     // for (var message in messages) {
     //   var response = await http.post(
     //     Uri.parse("http://$ip/api/messages"),
@@ -112,12 +167,12 @@ class _HomePageState extends State<HomePage> {
         title: const Text('FinPlan360'),
         backgroundColor: Colors.black,
         actions: [
-          IconButton(
-            onPressed: () async {
-              _readMessages();
-            },
-            icon: const Icon(Icons.message),
-          ),
+          // IconButton(
+          //   onPressed: () async {
+          //     _readMessages();
+          //   },
+          //   icon: const Icon(Icons.message),
+          // ),
           IconButton(
             onPressed: () async {
               _logoutuser();
