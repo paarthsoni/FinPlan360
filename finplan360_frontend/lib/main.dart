@@ -28,43 +28,18 @@ void main() async {
   runApp(
     MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute:
+          myMap['response'] == 'authenticated' ? homeRoute : loginRoute,
 
-      // check if username is created or not, if created then pass it to home page
-      // if not created then pass it to login page
-
-      initialRoute: loginRoute,
+      // initialRoute: loginRoute,
       routes: {
         loginRoute: (context) => LoginPage(
               isFromAuthPage: false,
               isFromSalaryPage: false,
             ),
         registerRoute: (context) => RegisterPage(),
-      },
-
-      onGenerateRoute: (settings) {
-        if (settings.name == salaryRoute) {
-          final args = settings.arguments as String;
-          return MaterialPageRoute(
-            builder: (context) => SalaryPage(username: args),
-          );
-        } else if (settings.name == homeRoute) {
-          final args = settings.arguments as String;
-          return MaterialPageRoute(
-            builder: (context) => HomePage(username: args),
-          );
-        }
-        // if (settings.name == authRoute) {
-        //   final args = settings.arguments as Map<String, dynamic>;
-        //   if (args['response'] == true) {
-        //     return MaterialPageRoute(
-        //       builder: (context) => HomePage(username: args['username']),
-        //     );
-        //   } else {
-        //     return MaterialPageRoute(
-        //       builder: (context) => SalaryPage(username: args['username']),
-        //     );
-        //   }
-        // }
+        salaryRoute: (context) => SalaryPage(username: username),
+        homeRoute: (context) => HomePage(username: username),
       },
     ),
   );
