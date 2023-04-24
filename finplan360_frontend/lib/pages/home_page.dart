@@ -95,7 +95,8 @@ class _HomePageState extends State<HomePage> {
     List<SmsMessage> filteredMessagesdebit = messages
         .where((message) =>
             message.body!.contains('debited from a/c') ||
-            message.body!.contains('Sent INR'))
+            message.body!.contains('Sent INR') ||
+            message.body!.contains('debited by'))
         .toList();
 
     for (var message in filteredMessagesdebit) {
