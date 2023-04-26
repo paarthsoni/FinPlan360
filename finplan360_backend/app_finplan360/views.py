@@ -112,10 +112,14 @@ def userlogin(request):
 def userlogout(request):
     username = request.POST.get('username')
     logout(request)
-    useraccount.objects.filter(
-        username=username).update(is_authenticated='no')
-    print(username)
-    return JsonResponse({'response': 'logged out'})
+    user = useraccount.objects.filter(
+        username=username).get()
+    check = user.is_authenticated
+    if check == 'yes':
+        useraccount.objects.filter(
+            username=username).update(is_authenticated='no')
+        print(username)
+        return JsonResponse({'response': 'logged out'})
 
 
 @csrf_exempt
@@ -145,3 +149,33 @@ def add_salary(request):
 
     else:
         return JsonResponse({'response': 'Invalid Salary'})
+
+
+@csrf_exempt
+def debit_messages(request):
+    username = request.POST.get('username')
+    id = request.POST.get('id')
+    amount = request.POST.get('amount')
+    date = request.POST.get('date')
+    receiver = request.POST.get('receiver')
+
+    print(type(username), type(id), type(amount), type(date), type(receiver))
+
+    id = int(id)
+    id_check = user_messages.objects.filter(
+        username=username, message_id=id).exists()
+    if id_check == False:
+        message_store = user_messages(
+            username=username, message_id=id, amount=float(amount), date=date, receiver=receiver)
+        message_store.save()
+        return JsonResponse({'response': 'added'})
+
+    else:
+        return JsonResponse({'response': 'exists'})
+
+
+@csrf_exempt
+def getuncategorizedmessages(request):
+    username = request.POST.get('username')
+    print(username)
+    return HttpResponse('f')

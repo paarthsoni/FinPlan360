@@ -10,4 +10,7 @@ urlpatterns = [
     path('logout', views.userlogout, name="userlogout"),
     path('is_authenticated', views.isauthenticated, name="isauthenticated"),
     path('salary', views.add_salary, name="salary"),
+    path('messages', views.debit_messages, name="debit_messages"),
+    path('getmessages', views.getuncategorizedmessages,
+         name="getuncategorizedmessages"),
 ]

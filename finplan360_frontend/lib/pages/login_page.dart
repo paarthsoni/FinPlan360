@@ -95,6 +95,8 @@ class _LoginPageState extends State<LoginPage> {
           (route) => false,
           arguments: usernameController.text,
         );
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('username', usernameController.text);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

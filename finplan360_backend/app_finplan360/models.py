@@ -23,3 +23,16 @@ class usersalary(models.Model):
 
     def __str__(self):
         return self.username
+
+
+class user_messages(models.Model):
+    username = models.CharField(null=False, max_length=1024)
+    message_id = models.IntegerField(null=False, default=0)
+    amount = models.FloatField(null=False, default=0)
+    date = models.CharField(null=False, default="", max_length=1024)
+    receiver = models.CharField(null=False, default="", max_length=1024)
+    category = models.CharField(null=True, max_length=1024)
+    is_categorized = models.CharField(null=True, max_length=1024)
+
+    def __str__(self):
+        return self.username + " "+str(self.message_id)
