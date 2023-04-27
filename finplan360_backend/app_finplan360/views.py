@@ -1,4 +1,4 @@
-
+import json
 from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
 from app_finplan360 import urls
@@ -7,9 +7,12 @@ from django.contrib.auth.models import User
 from .models import *
 import requests
 from datetime import datetime
-
+from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate, login, logout
+from datetime import date
+from django.core import serializers
+from django.http import JsonResponse
 
 
 @csrf_exempt
@@ -156,26 +159,41 @@ def debit_messages(request):
     username = request.POST.get('username')
     id = request.POST.get('id')
     amount = request.POST.get('amount')
-    date = request.POST.get('date')
+    messagedate = request.POST.get('date')
     receiver = request.POST.get('receiver')
-
     print(type(username), type(id), type(amount), type(date), type(receiver))
-
     id = int(id)
     id_check = user_messages.objects.filter(
         username=username, message_id=id).exists()
-    if id_check == False:
+    today = timezone.now().date()
+    start_of_month = today.replace(day=1)
+    # print(start_of_month)
+    # print(date.today())
+
+    if id_check == False and date.today() != start_of_month:
         message_store = user_messages(
-            username=username, message_id=id, amount=float(amount), date=date, receiver=receiver)
+            username=username, message_id=id, amount=float(amount), date=messagedate, receiver=receiver)
         message_store.save()
         return JsonResponse({'response': 'added'})
-
+    elif id_check == False and date.today() == start_of_month:
+        user_messages.objects.filter(username=username).delete()
+        message_store = user_messages(
+            username=username, message_id=id, amount=float(amount), date=messagedate, receiver=receiver)
+        message_store.save()
+        return JsonResponse({'response': 'added'})
     else:
         return JsonResponse({'response': 'exists'})
 
 
 @csrf_exempt
-def getuncategorizedmessages(request):
-    username = request.POST.get('username')
+def getuncategorizedmessages(request, username):
     print(username)
-    return HttpResponse('f')
+    user_uncategorizedmessages = user_messages.objects.filter(
+        username=username, category__isnull=True, is_categorized__isnull=True)
+    data = []
+    for obj in user_uncategorizedmessages:
+        data.append(
+            {'id': obj.message_id, 'amount': obj.amount, 'date': obj.date})
+    json_data = json.dumps(data)
+    print(json_data)
+    return JsonResponse(json_data, safe=False)

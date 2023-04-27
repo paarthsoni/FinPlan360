@@ -182,9 +182,15 @@ class _HomePageState extends State<HomePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('username') ?? 'null';
     try {
-      var response = await http.post(Uri.parse("http://$ip/api/getmessages"),
-          body: {'username': username});
-      print(response.body);
+      var response =
+          await http.get(Uri.parse("http://$ip/api/getmessages/$username"));
+
+      var result = jsonDecode(response.body);
+      print(result);
+      // final data = jsonDecode(response.body) as List<dynamic>;
+      // List<dynamic> data1 = data;
+      // List<int> ids = data1.map((item) => item['id'] as int).toList();
+      // print(ids);
     } catch (e) {
       print('Error is $e');
     }
@@ -208,6 +214,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             onPressed: () async {
               _logoutuser();
+              _getuncategorizedmessages();
             },
             icon: const Icon(Icons.logout),
           ),
