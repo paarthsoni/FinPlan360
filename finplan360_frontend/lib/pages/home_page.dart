@@ -26,10 +26,24 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final String username;
   _HomePageState(this.username);
+  late Future<List<Map<String, dynamic>>> _futureUncategorizedMessages;
+  late Map<int, String> _selectedCategories;
+
+  final List<String> _categories = [
+    'Food',
+    'Travel',
+    'Shopping',
+    'Entertainment',
+    'Others',
+  ];
+
+// _categories = _categories.toSet().toList();
 
   // text editing controllers
 
   bool _isloading = false;
+
+  List<dynamic> _uncategorizedMessages = [];
 
   int _selectedIndex = 0;
   PermissionStatus _permissionStatus = PermissionStatus.denied;
@@ -39,6 +53,9 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _checkPermission();
     _readMessages();
+    // _getuncategorizedmessages();\
+    _selectedCategories = {};
+    _futureUncategorizedMessages = _getuncategorizedmessages(widget.username);
   }
 
   Future<void> _checkPermission() async {
@@ -177,7 +194,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<String> _getuncategorizedmessages() async {
+  Future<List<Map<String, dynamic>>> _getuncategorizedmessages(
+      String username) async {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('username') ?? 'null';
@@ -185,8 +203,18 @@ class _HomePageState extends State<HomePage> {
       var response =
           await http.get(Uri.parse("http://$ip/api/getmessages/$username"));
 
-      var result = jsonDecode(response.body);
-      print(result);
+      // var result = json.decode(response.body);
+      // print(result);
+
+      if (response.statusCode == 200) {
+        final jsonList = json.decode(response.body) as List;
+        return jsonList.map((e) => e as Map<String, dynamic>).toList();
+      } else {
+        throw Exception('Failed to load uncategorized messages');
+      }
+
+      // print(_uncategorizedMessages);
+
       // final data = jsonDecode(response.body) as List<dynamic>;
       // List<dynamic> data1 = data;
       // List<int> ids = data1.map((item) => item['id'] as int).toList();
@@ -195,7 +223,7 @@ class _HomePageState extends State<HomePage> {
       print('Error is $e');
     }
 
-    return "";
+    return [];
   }
 
   @override
@@ -205,16 +233,10 @@ class _HomePageState extends State<HomePage> {
         title: const Text('FinPlan360'),
         backgroundColor: Colors.black,
         actions: [
-          // IconButton(
-          //   onPressed: () async {
-          //     _readMessages();
-          //   },
-          //   icon: const Icon(Icons.message),
-          // ),
           IconButton(
             onPressed: () async {
               _logoutuser();
-              _getuncategorizedmessages();
+              // _getuncategorizedmessages();
             },
             icon: const Icon(Icons.logout),
           ),
@@ -233,7 +255,80 @@ class _HomePageState extends State<HomePage> {
               child: Text('Table Content'),
             ),
             Center(
-              child: Text('Categorize'),
+              // child: ListView.builder(
+              //   itemCount: _uncategorizedMessages.length,
+              //   itemBuilder: (BuildContext context, int index) {
+              //     final message = _uncategorizedMessages[index];
+              //     return ListTile(
+              //       title: Text('Message ID: ${message['id']}'),
+              //       subtitle: Text(
+              //           'Amount: ${message['amount']}, Date: ${message['date']}'),
+              //     );
+              //   },
+              // ),
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _futureUncategorizedMessages,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final uncategorizedMessages = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: uncategorizedMessages.length,
+                      itemBuilder: (context, index) {
+                        final message = uncategorizedMessages[index];
+                        return Container(
+                          margin: EdgeInsets.symmetric(
+                              vertical: 8.0, horizontal: 16.0),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.shade300,
+                              width: 1.0,
+                            ),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          child: Column(
+                            children: [
+                              ListTile(
+                                leading: Icon(Icons.currency_rupee),
+                                title: Text('${message['amount']}'),
+                                subtitle: Text('${message['date']}'),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  DropdownButton<String>(
+                                    value: _selectedCategories[index],
+                                    hint: Text('Select a category'),
+                                    onChanged: (newValue) {
+                                      setState(() {
+                                        _selectedCategories[index] = newValue!;
+                                      });
+                                    },
+                                    items: _categories.map((category) {
+                                      return DropdownMenuItem(
+                                        value: category,
+                                        child: Text(category),
+                                      );
+                                    }).toList(),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.done),
+                                    onPressed: () {},
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('${snapshot.error}');
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
+              ),
             ),
           ],
         ),

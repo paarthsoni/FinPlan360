@@ -194,6 +194,6 @@ def getuncategorizedmessages(request, username):
     for obj in user_uncategorizedmessages:
         data.append(
             {'id': obj.message_id, 'amount': obj.amount, 'date': obj.date})
-    json_data = json.dumps(data)
-    print(json_data)
-    return JsonResponse(json_data, safe=False)
+    # json_data = json.dumps(data)
+    # print(json_data)
+    return JsonResponse(data, safe=False)
