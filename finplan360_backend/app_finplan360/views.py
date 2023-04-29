@@ -193,7 +193,32 @@ def getuncategorizedmessages(request, username):
     data = []
     for obj in user_uncategorizedmessages:
         data.append(
-            {'id': obj.message_id, 'amount': obj.amount, 'date': obj.date})
+            {'id': obj.message_id, 'amount': obj.amount, 'date': obj.date, 'receiver': obj.receiver})
     # json_data = json.dumps(data)
     # print(json_data)
+    return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def categorizemessages(request):
+    username = request.POST.get('username')
+    message_id = request.POST.get('message_id')
+    category = request.POST.get('category')
+    print(username, message_id, category)
+
+    user_messages.objects.filter(username=username, message_id=message_id).update(
+        category=category, is_categorized='yes')
+
+    return JsonResponse({'response': 'categorized'})
+
+
+def getcategorizedmessages(request, username):
+    print(username)
+    user_categorizedmessages = user_messages.objects.filter(
+        username=username, category__isnull=False, is_categorized__isnull=False)
+    data = []
+    for obj in user_categorizedmessages:
+        data.append(
+            {'id': obj.message_id, 'amount': obj.amount, 'date': obj.date, 'category': obj.category})
+    # print(data)
     return JsonResponse(data, safe=False)

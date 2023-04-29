@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
 import 'package:finplan360_frontend/constants/routes.dart';
@@ -55,7 +57,7 @@ class _HomePageState extends State<HomePage> {
     _readMessages();
     // _getuncategorizedmessages();\
     _selectedCategories = {};
-    _futureUncategorizedMessages = _getuncategorizedmessages(widget.username);
+    _futureUncategorizedMessages = _getuncategorizedmessages();
   }
 
   Future<void> _checkPermission() async {
@@ -194,14 +196,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<List<Map<String, dynamic>>> _getuncategorizedmessages(
-      String username) async {
+  Future<List<Map<String, dynamic>>> _getuncategorizedmessages() async {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('username') ?? 'null';
     try {
       var response =
           await http.get(Uri.parse("http://$ip/api/getmessages/$username"));
+
+      // print(response.body);
 
       // var result = json.decode(response.body);
       // print(result);
@@ -226,6 +229,51 @@ class _HomePageState extends State<HomePage> {
     return [];
   }
 
+  Future<String> _categorizemessages(int message_id, String Category) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username') ?? 'null';
+    try {
+      var response = await http
+          .post(Uri.parse("http://$ip/api/categorizemessages"), body: {
+        'username': username,
+        'message_id': message_id.toString(),
+        'category': Category
+      });
+
+      var result = jsonDecode(response.body);
+      if (result['response'] == 'categorized') {
+        setState(() {
+          _getuncategorizedmessages();
+        });
+      }
+    } catch (e) {
+      print('Error is $e');
+    }
+
+    return "";
+  }
+
+  Future<List<Map<String, dynamic>>> _getcategorizedmessages() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username') ?? 'null';
+    try {
+      var response = await http
+          .get(Uri.parse("http://$ip/api/getcategorizedmessages/$username"));
+      if (response.statusCode == 200) {
+        final jsonList = json.decode(response.body) as List;
+        // print(jsonList);
+        return jsonList.map((e) => e as Map<String, dynamic>).toList();
+      } else {
+        throw Exception('Failed to load uncategorized messages');
+      }
+    } catch (e) {
+      print("Error is $e");
+    }
+    return [];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,7 +284,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             onPressed: () async {
               _logoutuser();
-              // _getuncategorizedmessages();
+              _getcategorizedmessages();
             },
             icon: const Icon(Icons.logout),
           ),
@@ -266,62 +314,72 @@ class _HomePageState extends State<HomePage> {
               //     );
               //   },
               // ),
+
               child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: _futureUncategorizedMessages,
+                future: _getuncategorizedmessages(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final uncategorizedMessages = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: uncategorizedMessages.length,
-                      itemBuilder: (context, index) {
-                        final message = uncategorizedMessages[index];
-                        return Container(
-                          margin: EdgeInsets.symmetric(
-                              vertical: 8.0, horizontal: 16.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                              width: 1.0,
+                    if (snapshot.data!.length == 0) {
+                      return Text('No Uncategorized Messages found');
+                    } else {
+                      return ListView.builder(
+                        itemCount: uncategorizedMessages.length,
+                        itemBuilder: (context, index) {
+                          final message = uncategorizedMessages[index];
+                          return Container(
+                            margin: EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 16.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Color.fromARGB(255, 221, 7, 7),
+                                width: 1.0,
+                              ),
+                              borderRadius: BorderRadius.circular(10.0),
                             ),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          child: Column(
-                            children: [
-                              ListTile(
-                                leading: Icon(Icons.currency_rupee),
-                                title: Text('${message['amount']}'),
-                                subtitle: Text('${message['date']}'),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  DropdownButton<String>(
-                                    value: _selectedCategories[index],
-                                    hint: Text('Select a category'),
-                                    onChanged: (newValue) {
-                                      setState(() {
-                                        _selectedCategories[index] = newValue!;
-                                      });
-                                    },
-                                    items: _categories.map((category) {
-                                      return DropdownMenuItem(
-                                        value: category,
-                                        child: Text(category),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.done),
-                                    onPressed: () {},
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    );
+                            child: Column(
+                              children: [
+                                ListTile(
+                                  leading: Icon(Icons.currency_rupee),
+                                  title: Text('${message['amount']}'),
+                                  subtitle: Text(
+                                      '\nDebit Date: ${message['date']}\n\nUPI ID: ${message['receiver']}'),
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    DropdownButton<String>(
+                                      value: _selectedCategories[index],
+                                      hint: Text('Select a category'),
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          _selectedCategories[index] =
+                                              newValue!;
+                                        });
+                                      },
+                                      items: _categories.map((category) {
+                                        return DropdownMenuItem(
+                                          value: category,
+                                          child: Text(category),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.done),
+                                      onPressed: () {
+                                        _categorizemessages(message['id'],
+                                            _selectedCategories[index]!);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    }
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   } else {
@@ -345,8 +403,8 @@ class _HomePageState extends State<HomePage> {
             label: 'Pie Chart',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.table_chart),
-            label: 'Table',
+            icon: Icon(Icons.recommend_rounded),
+            label: 'Recommendation',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.category),

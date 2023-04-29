@@ -13,4 +13,7 @@ urlpatterns = [
     path('messages', views.debit_messages, name="debit_messages"),
     path('getmessages/<str:username>', views.getuncategorizedmessages,
          name="getuncategorizedmessages"),
+    path('categorizemessages', views.categorizemessages, name="categorizemessages"),
+    path('getcategorizedmessages/<str:username>', views.getcategorizedmessages,
+         name="getcategorizedmessages"),
 ]
