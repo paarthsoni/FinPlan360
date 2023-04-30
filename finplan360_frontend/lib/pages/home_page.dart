@@ -330,145 +330,183 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             // First item content
             Center(
-                child: Column(
-              children: [
-                StreamBuilder<List<Map<String, dynamic>>>(
-                  stream: _stream,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-                    if (snapshot.hasData) {
-                      // call shared prefernce named salary
-                      Future<int> userSalary = _getUserSalary();
-                      // print(userSalary);
-                      final categorizedMessages = snapshot.data;
-                      // final categoryAmounts = Map<String, double>();
-                      double spent = 0.0;
+              child: Column(
+                children: [
+                  StreamBuilder<List<Map<String, dynamic>>>(
+                    stream: _stream,
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+                      if (snapshot.hasData) {
+                        // call shared prefernce named salary
+                        Future<int> userSalary = _getUserSalary();
+                        // print(userSalary);
+                        final categorizedMessages = snapshot.data;
+                        // final categoryAmounts = Map<String, double>();
+                        double spent = 0.0;
 
-                      categorizedMessages?.forEach((message) {
-                        final category = message['category'];
-                        final amount = message['amount'];
+                        categorizedMessages?.forEach((message) {
+                          final category = message['category'];
+                          final amount = message['amount'];
 
-                        if (categoryAmounts.containsKey(category)) {
-                          final oldAmount = categoryAmounts[category]!;
-                          final newAmount = oldAmount + amount;
-                          categoryAmounts[category] = newAmount;
-                        } else {
-                          categoryAmounts[category] = amount;
-                        }
-                      });
+                          if (categoryAmounts.containsKey(category)) {
+                            final oldAmount = categoryAmounts[category]!;
+                            final newAmount = oldAmount + amount;
+                            categoryAmounts[category] = newAmount;
+                          } else {
+                            categoryAmounts[category] = amount;
+                          }
+                        });
 
-                      categoryAmounts.forEach((category, amount) {
-                        double percentage = (amount / salary) * 100;
-                        spent += percentage;
+                        categoryAmounts.forEach((category, amount) {
+                          double percentage = (amount / salary) * 100;
+                          spent += percentage;
 
-                        categoryAmounts[category] = percentage;
-                      });
+                          categoryAmounts[category] = percentage;
+                        });
 
-                      categoryAmounts['Savings'] = 100 - spent;
+                        categoryAmounts['Savings'] = 100 - spent;
 
-                      print(categoryAmounts);
+                        print(categoryAmounts);
 
-                      final List<PieChartSectionData> pieChartSections =
-                          categoryAmounts.entries
-                              .map((e) => PieChartSectionData(
-                                    value: e.value,
-                                    title: e.key +
-                                        '\n' +
-                                        e.value.toStringAsFixed(1) +
-                                        '%',
-                                    color: getColor(e.key),
-                                    radius: 150,
-                                    titleStyle: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                        final List<PieChartSectionData> pieChartSections =
+                            categoryAmounts.entries
+                                .map((e) => PieChartSectionData(
+                                      value: e.value,
+                                      title: e.key +
+                                          '\n' +
+                                          e.value.toStringAsFixed(1) +
+                                          '%',
+                                      color: getColor(e.key),
+                                      radius: 150,
+                                      titleStyle: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ))
+                                .toList();
+
+                        return Column(
+                          children: [
+                            Container(
+                              child: AspectRatio(
+                                aspectRatio: 1,
+                                child: PieChart(
+                                  PieChartData(
+                                    sections: pieChartSections,
+                                    centerSpaceRadius: 0,
+                                    borderData: FlBorderData(show: false),
+                                    sectionsSpace: 0,
+                                    // pieTouchData: PieTouchData(
+                                    //   touchCallback: (pieTouchResponse) => _onPieTouch(
+                                    //       context, pieTouchResponse, categorizedMessages),
+                                    // ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                                visible:
+                                    salary != 0 && categoryAmounts.isNotEmpty,
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      'Your Monthly Salary',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ))
-                              .toList();
-
-                      return Container(
-                        child: AspectRatio(
-                          aspectRatio: 1,
-                          child: PieChart(
-                            PieChartData(
-                              sections: pieChartSections,
-                              centerSpaceRadius: 0,
-                              borderData: FlBorderData(show: false),
-                              sectionsSpace: 0,
-                              // pieTouchData: PieTouchData(
-                              //   touchCallback: (pieTouchResponse) => _onPieTouch(
-                              //       context, pieTouchResponse, categorizedMessages),
-                              // ),
-                            ),
-                          ),
-                        ),
-                      );
-                    } else {
-                      // return circular progress indicator in the center of the screen
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                ),
-                const Text(
-                  'Your Monthly Salary',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                Text('₹ ' + salary.toString(),
-                    style: const TextStyle(fontSize: 16)),
-
-                const SizedBox(height: 10),
-                const Text(
-                  'Your Monthly Expenses',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                // salary - categoryAmounts['Savings']! * salary / 100
-                Text(
-                  '₹ ${(salary - (categoryAmounts['Savings'] ?? 0) * salary / 100).toStringAsFixed(0)}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-
-                const SizedBox(height: 10),
-
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: categoryAmounts.length,
-                    itemBuilder: (context, index) {
-                      final category = categoryAmounts.keys.elementAt(index);
-                      final amount = categoryAmounts[category]!;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 35),
-                        child: ListTile(
-                          title: Text(
-                            category,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          trailing: Text(
-                            '₹${(amount * salary / 100).toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      '₹ ' + salary.toString(),
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    const Text(
+                                      'Your Monthly Expenses',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    // salary - categoryAmounts['Savings']! * salary / 100
+                                    Text(
+                                      '₹ ${(salary - (categoryAmounts['Savings'] ?? 0) * salary / 100).toStringAsFixed(0)}',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ))
+                          ],
+                        );
+                      } else {
+                        // return circular progress indicator in the center of the screen
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
                     },
                   ),
-                ),
-              ],
-            )),
+                  // const Text(
+                  //   'Your Monthly Salary',
+                  //   style: TextStyle(
+                  //     fontSize: 18,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 5),
+                  // Text('₹ ' + salary.toString(),
+                  //     style: const TextStyle(fontSize: 16)),
+
+                  // const SizedBox(height: 10),
+                  // const Text(
+                  //   'Your Monthly Expenses',
+                  //   style: TextStyle(
+                  //     fontSize: 18,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 5),
+                  // // salary - categoryAmounts['Savings']! * salary / 100
+                  // Text(
+                  //   '₹ ${(salary - (categoryAmounts['Savings'] ?? 0) * salary / 100).toStringAsFixed(0)}',
+                  //   style: const TextStyle(fontSize: 16),
+                  // ),
+
+                  const SizedBox(height: 10),
+
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: categoryAmounts.length,
+                      itemBuilder: (context, index) {
+                        final category = categoryAmounts.keys.elementAt(index);
+                        final amount = categoryAmounts[category]!;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 35),
+                          child: ListTile(
+                            title: Text(
+                              category,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: Text(
+                              '₹${(amount * salary / 100).toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // Second item content
             Center(
               child: Text('Table Content'),
