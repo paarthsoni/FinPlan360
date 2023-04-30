@@ -4,6 +4,7 @@ import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
 import 'package:finplan360_frontend/constants/routes.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -30,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   _HomePageState(this.username);
   late Future<List<Map<String, dynamic>>> _futureUncategorizedMessages;
   late Map<int, String> _selectedCategories;
+  Stream<List<Map<String, dynamic>>>? _stream;
 
   final List<String> _categories = [
     'Food',
@@ -55,9 +57,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _checkPermission();
     _readMessages();
+    _getUserSalary();
     // _getuncategorizedmessages();\
     _selectedCategories = {};
     _futureUncategorizedMessages = _getuncategorizedmessages();
+    _stream = Stream.periodic(Duration(seconds: 10), (_) async {
+      return await _getcategorizedmessages();
+    }).asyncMap((event) async => await event);
   }
 
   Future<void> _checkPermission() async {
@@ -274,9 +280,35 @@ class _HomePageState extends State<HomePage> {
     return [];
   }
 
+  int salary = 0;
+
+  Future<int> _getUserSalary() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username') ?? 'null';
+    try {
+      var response =
+          await http.get(Uri.parse("http://$ip/api/getsalary/$username"));
+      if (response.statusCode == 200) {
+        salary = json.decode(response.body);
+        prefs.setInt('salary', salary);
+        print(salary);
+        return salary;
+      } else {
+        throw Exception('Failed to load user salary');
+      }
+    } catch (e) {
+      print("Error is $e");
+    }
+    return 0;
+  }
+
+  final categoryAmounts = Map<String, double>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Text('FinPlan360'),
         backgroundColor: Colors.black,
@@ -296,25 +328,152 @@ class _HomePageState extends State<HomePage> {
           children: <Widget>[
             // First item content
             Center(
-              child: Text('Pie Chart Content'),
-            ),
+                child: Column(
+              children: [
+                StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: _stream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+                    if (snapshot.hasData) {
+                      // call shared prefernce named salary
+                      Future<int> userSalary = _getUserSalary();
+                      // print(userSalary);
+                      final categorizedMessages = snapshot.data!;
+                      // final categoryAmounts = Map<String, double>();
+                      double spent = 0.0;
+
+                      categorizedMessages.forEach((message) {
+                        final category = message['category'];
+                        final amount = message['amount'];
+
+                        if (categoryAmounts.containsKey(category)) {
+                          final oldAmount = categoryAmounts[category]!;
+                          final newAmount = oldAmount + amount;
+                          categoryAmounts[category] = newAmount;
+                        } else {
+                          categoryAmounts[category] = amount;
+                        }
+                      });
+
+                      categoryAmounts.forEach((category, amount) {
+                        double percentage = (amount / salary) * 100;
+                        spent += percentage;
+
+                        categoryAmounts[category] = percentage;
+                      });
+
+                      categoryAmounts['Savings'] = 100 - spent;
+
+                      print(categoryAmounts);
+
+                      final List<PieChartSectionData> pieChartSections =
+                          categoryAmounts.entries
+                              .map((e) => PieChartSectionData(
+                                    value: e.value,
+                                    title: e.key +
+                                        '\n' +
+                                        e.value.toStringAsFixed(1) +
+                                        '%',
+                                    color: getColor(e.key),
+                                    radius: 150,
+                                    titleStyle: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ))
+                              .toList();
+
+                      return Container(
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: PieChart(
+                            PieChartData(
+                              sections: pieChartSections,
+                              centerSpaceRadius: 0,
+                              borderData: FlBorderData(show: false),
+                              sectionsSpace: 0,
+                              // pieTouchData: PieTouchData(
+                              //   touchCallback: (pieTouchResponse) => _onPieTouch(
+                              //       context, pieTouchResponse, categorizedMessages),
+                              // ),
+                            ),
+                          ),
+                        ),
+                      );
+                    } else {
+                      // return circular progress indicator in the center of the screen
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                ),
+                const Text(
+                  'Your Monthly Salary',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text('₹ ' + salary.toString(),
+                    style: const TextStyle(fontSize: 16)),
+
+                const SizedBox(height: 10),
+                const Text(
+                  'Your Monthly Expenses',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                // salary - categoryAmounts['Savings']! * salary / 100
+                Text(
+                  '₹ ' +
+                      (salary - categoryAmounts['Savings']! * salary / 100)
+                          .toStringAsFixed(0),
+                  style: const TextStyle(fontSize: 16),
+                ),
+
+                const SizedBox(height: 10),
+
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: categoryAmounts.length,
+                    itemBuilder: (context, index) {
+                      final category = categoryAmounts.keys.elementAt(index);
+                      final amount = categoryAmounts[category]!;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        child: ListTile(
+                          title: Text(
+                            category,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          trailing: Text(
+                            '₹${(amount * salary / 100).toStringAsFixed(0)}',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            )),
             // Second item content
             Center(
               child: Text('Table Content'),
             ),
             Center(
-              // child: ListView.builder(
-              //   itemCount: _uncategorizedMessages.length,
-              //   itemBuilder: (BuildContext context, int index) {
-              //     final message = _uncategorizedMessages[index];
-              //     return ListTile(
-              //       title: Text('Message ID: ${message['id']}'),
-              //       subtitle: Text(
-              //           'Amount: ${message['amount']}, Date: ${message['date']}'),
-              //     );
-              //   },
-              // ),
-
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: _getuncategorizedmessages(),
                 builder: (context, snapshot) {
@@ -418,4 +577,20 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+}
+
+Color getColor(String category) {
+  switch (category) {
+    case 'Food':
+      return Colors.red;
+    case 'Travel':
+      return Colors.blue;
+    case 'Shopping':
+      return Colors.yellow;
+    case 'Entertainment':
+      return Colors.green;
+    case 'Others':
+      return Colors.purple;
+  }
+  return Colors.grey.shade500;
 }

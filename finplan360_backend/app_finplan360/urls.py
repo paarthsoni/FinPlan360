@@ -16,4 +16,6 @@ urlpatterns = [
     path('categorizemessages', views.categorizemessages, name="categorizemessages"),
     path('getcategorizedmessages/<str:username>', views.getcategorizedmessages,
          name="getcategorizedmessages"),
+    path('getsalary/<str:username>',
+         views.getsalary, name="getsalary"),
 ]

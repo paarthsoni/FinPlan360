@@ -222,3 +222,17 @@ def getcategorizedmessages(request, username):
             {'id': obj.message_id, 'amount': obj.amount, 'date': obj.date, 'category': obj.category})
     # print(data)
     return JsonResponse(data, safe=False)
+
+
+# response of salary
+@csrf_exempt
+def getsalary(request, username):
+    print(username)
+    user_salary = usersalary.objects.filter(username=username).get()
+    data = user_salary.salary
+    # data = []
+
+    # for obj in user_salary:
+    # data.append({'salary': obj.salary})
+    # print(data)
+    return JsonResponse(data, safe=False)
