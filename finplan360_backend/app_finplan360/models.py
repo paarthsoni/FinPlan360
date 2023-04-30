@@ -36,3 +36,11 @@ class user_messages(models.Model):
 
     def __str__(self):
         return self.username + " "+str(self.message_id)
+
+
+class usernetsavings(models.Model):
+    username = models.CharField(null=False, max_length=1024)
+    netsavings = models.FloatField(null=True, default=0.00)
+
+    def __str__(self):
+        return self.username

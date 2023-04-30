@@ -70,8 +70,11 @@ def useraccountdetails(request):
                         username=username, password=password)
                     userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username,
                                            password=hashed_pwd, panoraadhar=make_password(aadharorpan), acc_creation_date=datetime.now())
+                    netsavings_user = usernetsavings(
+                        username=username, netsavings=0)
                     user.save()
                     userdata.save()
+                    netsavings_user.save()
                     # print("matched")
                     return JsonResponse({'response': 'Account Created Sucessfully'})
 
@@ -236,3 +239,21 @@ def getsalary(request, username):
     # data.append({'salary': obj.salary})
     # print(data)
     return JsonResponse(data, safe=False)
+
+
+@csrf_exempt
+def insertnetsavings(request):
+    username = request.POST.get('username')
+    savings_change = request.POST.get('savings')
+    savings_change = float(savings_change)
+    savings_change = round(savings_change, 2)
+    usersavings = usernetsavings.objects.filter(username=username).get()
+    savings = usersavings.netsavings
+    if (savings != savings_change):
+        updatesavings = savings+(float(savings_change)-savings)
+        usernetsavings.objects.filter(
+            username=username).update(netsavings=round(updatesavings, 2))
+        print(savings, savings_change)
+        return JsonResponse({'response': 'updated'})
+    else:
+        return JsonResponse({'response': 'no change'})

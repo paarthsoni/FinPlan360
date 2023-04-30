@@ -18,4 +18,6 @@ urlpatterns = [
          name="getcategorizedmessages"),
     path('getsalary/<str:username>',
          views.getsalary, name="getsalary"),
+    path('insertnetsavings',
+         views.insertnetsavings, name="getsalary"),
 ]

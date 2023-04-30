@@ -303,6 +303,27 @@ class _HomePageState extends State<HomePage> {
     return 0;
   }
 
+  Future<void> _insertnetsavings(double savings) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username') ?? 'null';
+    try {
+      var response =
+          await http.post(Uri.parse("http://$ip/api/insertnetsavings"), body: {
+        'username': username,
+        'savings': savings.toString(),
+      });
+      var result = json.decode(response.body);
+      if (result['response'] == 'updated') {
+        print('updated');
+      } else {
+        print('no change');
+      }
+    } catch (e) {
+      print("Error is $e");
+    }
+  }
+
   // final categoryAmounts = Map<String, double>();
 
   Map<String, double> categoryAmounts = {};
@@ -365,6 +386,24 @@ class _HomePageState extends State<HomePage> {
                         });
 
                         categoryAmounts['Savings'] = 100 - spent;
+
+                        DateTime lastDayOfMonth = DateTime(
+                            DateTime.now().year, DateTime.now().month + 1, 0);
+                        String formattedDate1 =
+                            DateFormat('yyyy-MM-dd').format(lastDayOfMonth);
+                        DateTime now = DateTime.now();
+                        String formattedDate =
+                            DateFormat('yyyy-MM-dd').format(now);
+                        print(formattedDate1);
+                        print(formattedDate);
+                        if (formattedDate == formattedDate1) {
+                          var netsavings =
+                              (categoryAmounts['Savings'] ?? 0) * salary / 100;
+                          print(netsavings.runtimeType);
+                          _insertnetsavings(netsavings);
+                        } else {
+                          print('false');
+                        }
 
                         print(categoryAmounts);
 
@@ -565,8 +604,19 @@ class _HomePageState extends State<HomePage> {
                                     IconButton(
                                       icon: Icon(Icons.done),
                                       onPressed: () {
-                                        _categorizemessages(message['id'],
-                                            _selectedCategories[index]!);
+                                        if (_selectedCategories[index] !=
+                                            null) {
+                                          _categorizemessages(message['id'],
+                                              _selectedCategories[index]!);
+                                        } else {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  'No Category Selected!!'),
+                                            ),
+                                          );
+                                        }
                                       },
                                     ),
                                   ],
