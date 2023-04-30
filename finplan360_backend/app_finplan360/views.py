@@ -13,6 +13,7 @@ from django.contrib.auth import authenticate, login, logout
 from datetime import date
 from django.core import serializers
 from django.http import JsonResponse
+import datetime
 
 
 @csrf_exempt
@@ -71,7 +72,7 @@ def useraccountdetails(request):
                     userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username,
                                            password=hashed_pwd, panoraadhar=make_password(aadharorpan), acc_creation_date=datetime.now())
                     netsavings_user = usernetsavings(
-                        username=username, netsavings=0)
+                        username=username, netsavings=0, update_check=0)
                     user.save()
                     userdata.save()
                     netsavings_user.save()
@@ -104,6 +105,18 @@ def userlogin(request):
 
     if user is not None:
         print("user logged in")
+        now = datetime.date.today()
+        last_day_of_month = datetime.date(
+            now.year, now.month, 1) + datetime.timedelta(days=32)
+        last_day_of_month = last_day_of_month.replace(
+            day=1) - datetime.timedelta(days=1)
+
+        print(now, last_day_of_month)
+
+        if (now != last_day_of_month):
+            usernetsavings.objects.filter(
+                username=username).update(update_check=0)
+
         useraccount.objects.filter(
             username=username).update(is_authenticated='yes')
 
@@ -249,10 +262,19 @@ def insertnetsavings(request):
     savings_change = round(savings_change, 2)
     usersavings = usernetsavings.objects.filter(username=username).get()
     savings = usersavings.netsavings
-    if (savings != savings_change):
+    check = usersavings.update_check
+    if (savings != savings_change and check == 1):
         updatesavings = savings+(float(savings_change)-savings)
         usernetsavings.objects.filter(
             username=username).update(netsavings=round(updatesavings, 2))
+        print(savings, savings_change)
+        return JsonResponse({'response': 'updated'})
+
+    elif (savings != savings_change and check == 0):
+        updatesavings = savings+float(savings_change)
+        usernetsavings.objects.filter(
+            username=username).update(netsavings=round(updatesavings, 2))
+        usernetsavings.objects.filter(username=username).update(update_check=1)
         print(savings, savings_change)
         return JsonResponse({'response': 'updated'})
     else:
