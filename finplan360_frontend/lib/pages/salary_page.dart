@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:finplan360_frontend/pages/register_page.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SalaryPage extends StatefulWidget {
   final String username;
@@ -115,9 +116,13 @@ class _SalaryPageState extends State<SalaryPage> {
                 MyButton(
                   onTap: () async {
                     try {
+                      WidgetsFlutterBinding.ensureInitialized();
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      var username = prefs.getString('username') ?? 'null';
                       var response = await http
                           .post(Uri.parse("http://$ip/api/salary"), body: {
-                        'username': widget.username,
+                        'username': username,
                         'salary': _salaryController.text,
                       });
 
