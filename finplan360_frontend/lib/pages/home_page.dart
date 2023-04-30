@@ -303,7 +303,9 @@ class _HomePageState extends State<HomePage> {
     return 0;
   }
 
-  final categoryAmounts = Map<String, double>();
+  // final categoryAmounts = Map<String, double>();
+
+  Map<String, double> categoryAmounts = {};
 
   @override
   Widget build(BuildContext context) {
@@ -338,11 +340,11 @@ class _HomePageState extends State<HomePage> {
                       // call shared prefernce named salary
                       Future<int> userSalary = _getUserSalary();
                       // print(userSalary);
-                      final categorizedMessages = snapshot.data!;
+                      final categorizedMessages = snapshot.data;
                       // final categoryAmounts = Map<String, double>();
                       double spent = 0.0;
 
-                      categorizedMessages.forEach((message) {
+                      categorizedMessages?.forEach((message) {
                         final category = message['category'];
                         final amount = message['amount'];
 
@@ -431,9 +433,7 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 5),
                 // salary - categoryAmounts['Savings']! * salary / 100
                 Text(
-                  '₹ ' +
-                      (salary - categoryAmounts['Savings']! * salary / 100)
-                          .toStringAsFixed(0),
+                  '₹ ${(salary - (categoryAmounts['Savings'] ?? 0) * salary / 100).toStringAsFixed(0)}',
                   style: const TextStyle(fontSize: 16),
                 ),
 
