@@ -41,7 +41,15 @@ class user_messages(models.Model):
 class usernetsavings(models.Model):
     username = models.CharField(null=False, max_length=1024)
     netsavings = models.FloatField(null=True, default=0.00)
-    update_check = models.IntegerField(null=True,default=0)
+    update_check = models.IntegerField(null=True, default=0)
+
+    def __str__(self):
+        return self.username
+
+
+class user_message_deletecheck(models.Model):
+    username = models.CharField(null=False, max_length=1024)
+    message_delete_check = models.IntegerField(null=False, default=0)
 
     def __str__(self):
         return self.username

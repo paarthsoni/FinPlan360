@@ -73,9 +73,12 @@ def useraccountdetails(request):
                                            password=hashed_pwd, panoraadhar=make_password(aadharorpan), acc_creation_date=datetime.now())
                     netsavings_user = usernetsavings(
                         username=username, netsavings=0, update_check=0)
+                    user_message_delete_check = user_message_deletecheck(
+                        username=username, message_delete_check=0)
                     user.save()
                     userdata.save()
                     netsavings_user.save()
+                    user_message_delete_check.save()
                     # print("matched")
                     return JsonResponse({'response': 'Account Created Sucessfully'})
 
@@ -113,9 +116,27 @@ def userlogin(request):
 
         print(now, last_day_of_month)
 
+        todaynow = timezone.now().date()
+        start_of_month = todaynow.replace(day=1)
+        # print(start_of_month)
+        # print(date.today())
+
         if (now != last_day_of_month):
             usernetsavings.objects.filter(
                 username=username).update(update_check=0)
+
+        if (todaynow == start_of_month):
+            delete_check = user_message_deletecheck.objects.filter(
+                username=username).get()
+            check_val = delete_check.message_delete_check
+            if check_val == 0:
+                user_messages.objects.filter(username=username).delete()
+                user_message_deletecheck.objects.filter(
+                    username=username).update(message_delete_check=1)
+
+        elif (todaynow != start_of_month):
+            user_message_deletecheck.objects.filter(
+                username=username).update(message_delete_check=0)
 
         useraccount.objects.filter(
             username=username).update(is_authenticated='yes')

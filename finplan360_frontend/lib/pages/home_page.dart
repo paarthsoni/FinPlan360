@@ -385,6 +385,7 @@ class _HomePageState extends State<HomePage> {
                           categoryAmounts[category] = percentage;
                         });
 
+                        print(categoryAmounts);
                         categoryAmounts['Savings'] = 100 - spent;
 
                         DateTime lastDayOfMonth = DateTime(
