@@ -14,6 +14,10 @@ from datetime import date
 from django.core import serializers
 from django.http import JsonResponse
 import datetime
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 
 
 @csrf_exempt
@@ -300,3 +304,68 @@ def insertnetsavings(request):
         return JsonResponse({'response': 'updated'})
     else:
         return JsonResponse({'response': 'no change'})
+
+
+def getrecommendations(request, username):
+    user_netsavings = usernetsavings.objects.filter(username=username).get()
+    netsavings = user_netsavings.netsavings
+    print(netsavings)
+    # Load the dataset
+    df = pd.read_csv(
+        "./dataset/travel_packages.csv")
+
+    # Drop the 'index' column
+    df.drop('index', axis=1, inplace=True)
+
+    # Label encode the 'place' column
+    le = LabelEncoder()
+    df['place'] = le.fit_transform(df['place'])
+
+    # Convert the 'price' column to numeric
+    df['price'] = df['price'].str.replace(',', '').astype(float)
+
+    # Convert the 'time' column to numeric
+    df['time'] = df['time'].str.extract('(\d+)', expand=False).astype(int)
+
+    # Drop the 'about_trip' column
+    df.drop('about_trip', axis=1, inplace=True)
+
+    # Convert the 'emi' column to numeric
+    df['emi'] = df['emi'].str.extract('(\d+)', expand=False).astype(float)
+
+    # Split the data into training and testing sets
+    X = df.drop('place', axis=1)
+    y = df['place']
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42)
+
+    # Create a Random Forest Classifier and fit the model
+    rfc = RandomForestClassifier()
+    rfc.fit(X_train, y_train)
+
+    # Predict the best possible holiday destinations based on salary
+    salary = netsavings
+    # Retrieve the corresponding rows from the original DataFrame
+    # filter rows with price <= salary
+    X_pred = X_test[X_test['price'] <= salary]
+    y_pred = rfc.predict(X_pred)
+    # convert label encoded values back to original names
+    predicted_destinations = le.inverse_transform(y_pred)
+
+    # Create a DataFrame with predicted destinations and their prices
+    predicted_destinations_df = X_pred.copy()
+    predicted_destinations_df['place'] = predicted_destinations
+    predicted_destinations_df = predicted_destinations_df[[
+        'place', 'price', 'time']]
+
+    # Select the top 5 recommended destinations based on price and drop duplicates
+    recommended_destinations = predicted_destinations_df.sort_values(
+        by='price').drop_duplicates('place').head(30)
+
+    # Print the recommended destinations
+    data = []
+    for index, destination in recommended_destinations.iterrows():
+        data.append(
+            {'Place': destination['place'], 'amount': destination['price'], 'duration': destination['time']})
+    print(data)
+    return JsonResponse(data, safe=False)

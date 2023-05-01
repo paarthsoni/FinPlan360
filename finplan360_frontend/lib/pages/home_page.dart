@@ -57,6 +57,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _checkPermission();
     _readMessages();
+    // _getrecommendations();
     _getUserSalary();
     // _getuncategorizedmessages();\
     _selectedCategories = {};
@@ -326,6 +327,26 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<List<Map<String, dynamic>>> _getrecommendations() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var username = prefs.getString('username') ?? 'null';
+    try {
+      var response =
+          await http.get(Uri.parse("http://$ip/api/recommendations/$username"));
+      if (response.statusCode == 200) {
+        final jsonList = json.decode(response.body) as List;
+        print(jsonList);
+        // return jsonList.map((e) => e as Map<String, dynamic>).toList();
+      } else {
+        throw Exception('Failed to load recommendations');
+      }
+    } catch (e) {
+      print('Error is $e');
+    }
+    return [];
+  }
+
   // final categoryAmounts = Map<String, double>();
 
   Map<String, double> categoryAmounts = {};
@@ -341,7 +362,6 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             onPressed: () async {
               _logoutuser();
-              _getcategorizedmessages();
             },
             icon: const Icon(Icons.logout),
           ),
@@ -566,8 +586,18 @@ class _HomePageState extends State<HomePage> {
             ),
             // Second item content
             Center(
-              child: Text('Table Content'),
-            ),
+                child: FutureBuilder<List<Map<String, dynamic>>>(
+              future: _getrecommendations(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text('recommendations');
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            )),
             Center(
               child: FutureBuilder<List<Map<String, dynamic>>>(
                 future: _getuncategorizedmessages(),
