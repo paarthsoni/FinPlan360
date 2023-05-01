@@ -61,7 +61,9 @@ class _HomePageState extends State<HomePage> {
     // _getuncategorizedmessages();\
     _selectedCategories = {};
     _futureUncategorizedMessages = _getuncategorizedmessages();
-    _stream = Stream.periodic(Duration(seconds: 10), (_) async {
+    _stream = Stream.periodic(Duration(seconds: 60), (_) async {
+      _readMessages();
+      _futureUncategorizedMessages = _getuncategorizedmessages();
       return await _getcategorizedmessages();
     }).asyncMap((event) async => await event);
   }
@@ -139,7 +141,7 @@ class _HomePageState extends State<HomePage> {
           .format(startOfMonth); // Format the date as desired
 
       if (message.date!.isAfter(startOfMonth)) {
-        print('id: ${message.id}');
+        // print('id: ${message.id}');
 
         String? messageBody = message.body;
 
@@ -180,9 +182,9 @@ class _HomePageState extends State<HomePage> {
         if (matchamount != null) {
           debitedAmount = matchamount.group(1);
 
-          print('Debited amount: $debitedAmount');
-          print('Date on which amount Debited : ' + desiredText);
-          print('Vpa: ' + desiredText1);
+          // print('Debited amount: $debitedAmount');
+          // print('Date on which amount Debited : ' + desiredText);
+          // print('Vpa: ' + desiredText1);
         } else {
           print('No debited amount found in message.');
         }
@@ -197,7 +199,7 @@ class _HomePageState extends State<HomePage> {
             'receiver': desiredText1,
           },
         );
-        print(response.body);
+        // print(response.body);
       }
     }
   }
@@ -292,7 +294,7 @@ class _HomePageState extends State<HomePage> {
       if (response.statusCode == 200) {
         salary = json.decode(response.body);
         prefs.setInt('salary', salary);
-        print(salary);
+        // print(salary);
         return salary;
       } else {
         throw Exception('Failed to load user salary');
@@ -365,28 +367,40 @@ class _HomePageState extends State<HomePage> {
                         // final categoryAmounts = Map<String, double>();
                         double spent = 0.0;
 
-                        categorizedMessages?.forEach((message) {
-                          final category = message['category'];
-                          final amount = message['amount'];
+                        categoryAmounts.clear();
 
-                          if (categoryAmounts.containsKey(category)) {
-                            final oldAmount = categoryAmounts[category]!;
-                            final newAmount = oldAmount + amount;
-                            categoryAmounts[category] = newAmount;
-                          } else {
-                            categoryAmounts[category] = amount;
-                          }
-                        });
+                        categorizedMessages?.forEach(
+                          (message) {
+                            final category = message['category'];
+                            final amount = message['amount'];
 
-                        categoryAmounts.forEach((category, amount) {
-                          double percentage = (amount / salary) * 100;
-                          spent += percentage;
+                            if (categoryAmounts.containsKey(category)) {
+                              final oldAmount = categoryAmounts[category]!;
+                              final newAmount = oldAmount + amount;
+                              categoryAmounts[category] = newAmount;
+                              spent += amount;
+                            } else {
+                              categoryAmounts[category] = amount;
+                              spent += amount;
+                            }
+                          },
+                        );
 
-                          categoryAmounts[category] = percentage;
-                        });
+                        // categoryAmounts.forEach((category, amount) {
+                        //   double percentage = 0;
+                        //   if (salary > 0) {
+                        //     percentage = (amount / salary) * 100;
+                        //     percentage =
+                        //         double.parse(percentage.toStringAsFixed(2));
+                        //   }
+                        //   spent += percentage;
+                        //   categoryAmounts[category] = percentage;
+                        // });
+                        spent = double.parse(spent.toStringAsFixed(2));
 
-                        print(categoryAmounts);
-                        categoryAmounts['Savings'] = 100 - spent;
+                        // print(categoryAmounts);
+                        categoryAmounts['Savings'] =
+                            (salary - spent).ceilToDouble();
 
                         DateTime lastDayOfMonth = DateTime(
                             DateTime.now().year, DateTime.now().month + 1, 0);
@@ -395,18 +409,19 @@ class _HomePageState extends State<HomePage> {
                         DateTime now = DateTime.now();
                         String formattedDate =
                             DateFormat('yyyy-MM-dd').format(now);
-                        print(formattedDate1);
-                        print(formattedDate);
+                        // print(formattedDate1);
+                        // print(formattedDate);
                         if (formattedDate == formattedDate1) {
                           var netsavings =
                               (categoryAmounts['Savings'] ?? 0) * salary / 100;
-                          print(netsavings.runtimeType);
+                          // print(netsavings.runtimeType);
                           _insertnetsavings(netsavings);
-                        } else {
-                          print('false');
                         }
+                        // else {
+                        //   print('false');
+                        // }
 
-                        print(categoryAmounts);
+                        // print(categoryAmounts);
 
                         final List<PieChartSectionData> pieChartSections =
                             categoryAmounts.entries
@@ -414,7 +429,8 @@ class _HomePageState extends State<HomePage> {
                                       value: e.value,
                                       title: e.key +
                                           '\n' +
-                                          e.value.toStringAsFixed(1) +
+                                          (e.value / salary * 100)
+                                              .toStringAsFixed(1) +
                                           '%',
                                       color: getColor(e.key),
                                       radius: 150,
@@ -446,38 +462,39 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             Visibility(
-                                visible:
-                                    salary != 0 && categoryAmounts.isNotEmpty,
-                                child: Column(
-                                  children: [
-                                    const Text(
-                                      'Your Monthly Salary',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              visible:
+                                  salary != 0 && categoryAmounts.isNotEmpty,
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    'Your Monthly Salary',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      '₹ ' + salary.toString(),
-                                      style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    '₹ ' + salary.toString(),
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    'Your Monthly Expenses',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
-                                    const SizedBox(height: 10),
-                                    const Text(
-                                      'Your Monthly Expenses',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    // salary - categoryAmounts['Savings']! * salary / 100
-                                    Text(
-                                      '₹ ${(salary - (categoryAmounts['Savings'] ?? 0) * salary / 100).toStringAsFixed(0)}',
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ],
-                                ))
+                                  ),
+                                  const SizedBox(height: 5),
+                                  // salary - categoryAmounts['Savings']! * salary / 100
+                                  Text(
+                                    '₹ ${(salary - (categoryAmounts['Savings'] ?? 0)).toStringAsFixed(0)}',
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
                         );
                       } else {
@@ -533,7 +550,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                             trailing: Text(
-                              '₹${(amount * salary / 100).toStringAsFixed(0)}',
+                              '₹${(amount).toStringAsFixed(0)}',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -569,7 +586,7 @@ class _HomePageState extends State<HomePage> {
                                 vertical: 8.0, horizontal: 16.0),
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Color.fromARGB(255, 221, 7, 7),
+                                color: Colors.black,
                                 width: 1.0,
                               ),
                               borderRadius: BorderRadius.circular(10.0),

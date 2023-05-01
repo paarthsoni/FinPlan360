@@ -213,7 +213,7 @@ def debit_messages(request):
         message_store.save()
         return JsonResponse({'response': 'added'})
     elif id_check == False and date.today() == start_of_month:
-        user_messages.objects.filter(username=username).delete()
+        # user_messages.objects.filter(username=username).delete()
         message_store = user_messages(
             username=username, message_id=id, amount=float(amount), date=messagedate, receiver=receiver)
         message_store.save()
