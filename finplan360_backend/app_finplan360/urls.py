@@ -23,4 +23,6 @@ urlpatterns = [
 
     path('recommendations/<str:username>',
          views.getrecommendations, name="getrecommendations"),
+    path('getnetsavings/<str:username>',
+         views.getnetsavings, name="getnetsavings"),
 ]

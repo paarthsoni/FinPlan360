@@ -1,9 +1,7 @@
-import 'dart:ffi';
-
-import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
 import 'package:finplan360_frontend/constants/routes.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
+import 'package:finplan360_frontend/pages/profile_page.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -62,7 +60,7 @@ class _HomePageState extends State<HomePage> {
     // _getuncategorizedmessages();\
     _selectedCategories = {};
     _futureUncategorizedMessages = _getuncategorizedmessages();
-    _stream = Stream.periodic(Duration(seconds: 60), (_) async {
+    _stream = Stream.periodic(Duration(seconds: 10), (_) async {
       _readMessages();
       _futureUncategorizedMessages = _getuncategorizedmessages();
       return await _getcategorizedmessages();
@@ -327,16 +325,39 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  List<dynamic> recommendationList = [];
+  String firstImageUrl =
+      "https://pixabay.com/api/?key=25481727-f7a17116390afbe2ad4a0ead5&q=error&image_type=photo";
+
   Future<List<Map<String, dynamic>>> _getrecommendations() async {
     WidgetsFlutterBinding.ensureInitialized();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var username = prefs.getString('username') ?? 'null';
+
+    // final url = Uri.parse(
+    //     'https://pixabay.com/api/?key=25481727-f7a17116390afbe2ad4a0ead5&q=yellow+flowers&image_type=photo');
+    // final responseimg = await http.get(url);
+
+    // try {
+    //   if (responseimg.statusCode == 200) {
+    //     final jsonBody = json.decode(responseimg.body);
+    //     final firstHit = jsonBody['hits'][0];
+    //     firstImageUrl = firstHit['webformatURL'];
+    //     print(firstImageUrl);
+    //   } else {
+    //     throw Exception('Failed to load Pixabay API');
+    //   }
+    // } catch (e) {
+    //   print('Error loading Pixabay API: $e');
+    // }
+
     try {
       var response =
           await http.get(Uri.parse("http://$ip/api/recommendations/$username"));
       if (response.statusCode == 200) {
-        final jsonList = json.decode(response.body) as List;
-        print(jsonList);
+        recommendationList = json.decode(response.body) as List;
+        print(recommendationList);
+        // recommendationList.insert(0, {'imageURL': firstImageUrl});
         // return jsonList.map((e) => e as Map<String, dynamic>).toList();
       } else {
         throw Exception('Failed to load recommendations');
@@ -345,6 +366,27 @@ class _HomePageState extends State<HomePage> {
       print('Error is $e');
     }
     return [];
+  }
+
+  Future<String> _imageofplace(String recomPlace) async {
+    final url = Uri.parse(
+        'https://pixabay.com/api/?key=25481727-f7a17116390afbe2ad4a0ead5&q=$recomPlace&image_type=photo');
+    final responseimg = await http.get(url);
+
+    try {
+      if (responseimg.statusCode == 200) {
+        final jsonBody = json.decode(responseimg.body);
+        final firstHit = jsonBody['hits'][0];
+        firstImageUrl = firstHit['webformatURL'];
+        print(firstImageUrl);
+      } else {
+        throw Exception('Failed to load Pixabay API');
+      }
+    } catch (e) {
+      print('Error loading Pixabay API: $e');
+    }
+
+    return firstImageUrl;
   }
 
   // final categoryAmounts = Map<String, double>();
@@ -359,13 +401,25 @@ class _HomePageState extends State<HomePage> {
         title: const Text('FinPlan360'),
         backgroundColor: Colors.black,
         actions: [
-          IconButton(
-            onPressed: () async {
-              _logoutuser();
-            },
-            icon: const Icon(Icons.logout),
+          Builder(
+            builder: (context) => IconButton(
+              icon: Icon(Icons.account_circle),
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
+            ),
           ),
+
+          // IconButton(
+          //   onPressed: () async {
+          //     _logoutuser();
+          //   },
+          //   icon: const Icon(Icons.logout),
+          // ),
         ],
+      ),
+      endDrawer: MyNavigationDrawer(
+        username: username,
       ),
       body: SafeArea(
         child: IndexedStack(
@@ -590,7 +644,73 @@ class _HomePageState extends State<HomePage> {
               future: _getrecommendations(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Text('recommendations');
+                  return ListView.builder(
+                    itemCount: recommendationList.length,
+                    itemBuilder: (context, index) {
+                      final recommendations = recommendationList[index];
+                      return Container(
+                        margin: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 1.0,
+                          ),
+                          borderRadius: BorderRadius.circular(10.0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.7),
+                              spreadRadius: 2,
+                              blurRadius: 3,
+                              offset: Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ListTile(
+                                leading: Icon(Icons.airplane_ticket),
+                                title: Text('${recommendations['Place']}'),
+                                subtitle: Text(
+                                  '\nAmount: ${recommendations['amount']}\n\nDuration: ${recommendations['duration']} Nights',
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 15.0),
+                              child: Container(
+                                width: 100.0,
+                                child: FutureBuilder<String>(
+                                  future:
+                                      _imageofplace(recommendations['Place']),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData &&
+                                        snapshot.data != null) {
+                                      return ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        child: Image.network(
+                                          snapshot.data!,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return Text(
+                                          'Error loading image: ${snapshot.error}');
+                                    } else {
+                                      return CircularProgressIndicator();
+                                    }
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else {
@@ -615,11 +735,20 @@ class _HomePageState extends State<HomePage> {
                             margin: EdgeInsets.symmetric(
                                 vertical: 8.0, horizontal: 16.0),
                             decoration: BoxDecoration(
+                              color: Colors.white,
                               border: Border.all(
                                 color: Colors.black,
                                 width: 1.0,
                               ),
                               borderRadius: BorderRadius.circular(10.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.7),
+                                  spreadRadius: 2,
+                                  blurRadius: 3,
+                                  offset: Offset(0, 3),
+                                ),
+                              ],
                             ),
                             child: Column(
                               children: [
@@ -629,45 +758,49 @@ class _HomePageState extends State<HomePage> {
                                   subtitle: Text(
                                       '\nDebit Date: ${message['date']}\n\nUPI ID: ${message['receiver']}'),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    DropdownButton<String>(
-                                      value: _selectedCategories[index],
-                                      hint: Text('Select a category'),
-                                      onChanged: (newValue) {
-                                        setState(() {
-                                          _selectedCategories[index] =
-                                              newValue!;
-                                        });
-                                      },
-                                      items: _categories.map((category) {
-                                        return DropdownMenuItem(
-                                          value: category,
-                                          child: Text(category),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.done),
-                                      onPressed: () {
-                                        if (_selectedCategories[index] !=
-                                            null) {
-                                          _categorizemessages(message['id'],
-                                              _selectedCategories[index]!);
-                                        } else {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                  'No Category Selected!!'),
-                                            ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      DropdownButton<String>(
+                                        value: _selectedCategories[index],
+                                        hint: Text('Select a category'),
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            _selectedCategories[index] =
+                                                newValue!;
+                                          });
+                                        },
+                                        items: _categories.map((category) {
+                                          return DropdownMenuItem(
+                                            value: category,
+                                            child: Text(category),
                                           );
-                                        }
-                                      },
-                                    ),
-                                  ],
+                                        }).toList(),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.done),
+                                        onPressed: () {
+                                          if (_selectedCategories[index] !=
+                                              null) {
+                                            _categorizemessages(message['id'],
+                                                _selectedCategories[index]!);
+                                          } else {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    'No Category Selected!!'),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

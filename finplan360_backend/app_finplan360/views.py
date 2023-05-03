@@ -369,3 +369,11 @@ def getrecommendations(request, username):
             {'Place': destination['place'], 'amount': destination['price'], 'duration': destination['time']})
     print(data)
     return JsonResponse(data, safe=False)
+
+
+# get net savings
+def getnetsavings(request, username):
+    user_netsavings = usernetsavings.objects.filter(username=username).get()
+    netsavings = user_netsavings.netsavings
+    print(netsavings)
+    return JsonResponse({'response': netsavings})
