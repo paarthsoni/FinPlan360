@@ -23,6 +23,8 @@ void main() async {
     print(response.body);
     myMap = json.decode(response.body);
     print(myMap['response']);
+  } else if (username == 'null') {
+    myMap['response'] = 'not authenticated';
   }
 
   runApp(

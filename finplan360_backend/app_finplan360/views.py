@@ -1,3 +1,4 @@
+import calendar
 import json
 from django.http import JsonResponse
 from django.shortcuts import render, HttpResponse
@@ -6,14 +7,12 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from .models import *
 import requests
-from datetime import datetime
+from datetime import datetime, date
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth import authenticate, login, logout
-from datetime import date
-from django.core import serializers
 from django.http import JsonResponse
-import datetime
+# import datetime
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
@@ -56,12 +55,13 @@ def useraccountdetails(request):
             }
             headers = {
                 "content-type": "application/json",
-                "X-RapidAPI-Key": "1ba039b9dbmsh24028dac9b2690bp191d6ejsnfb265c824e91",
+                "X-RapidAPI-Key": "707f1cec22mshb131327fd722355p1708efjsn5c3ad3367dec",
                 "X-RapidAPI-Host": "pan-card-verification1.p.rapidapi.com"
             }
 
-            response = requests.request(
-                "POST", url, json=payload, headers=headers)
+            response = requests.post(url, json=payload, headers=headers)
+
+            print(response.json())
 
             print(response.text)
             response = response.json()
@@ -76,7 +76,7 @@ def useraccountdetails(request):
                     userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username,
                                            password=hashed_pwd, panoraadhar=make_password(aadharorpan), acc_creation_date=datetime.now())
                     netsavings_user = usernetsavings(
-                        username=username, netsavings=0, update_check=0)
+                        username=username, netsavings=10000, update_check=0)
                     user_message_delete_check = user_message_deletecheck(
                         username=username, message_delete_check=0)
                     user.save()
@@ -112,20 +112,23 @@ def userlogin(request):
 
     if user is not None:
         print("user logged in")
-        now = datetime.date.today()
-        last_day_of_month = datetime.date(
-            now.year, now.month, 1) + datetime.timedelta(days=32)
-        last_day_of_month = last_day_of_month.replace(
-            day=1) - datetime.timedelta(days=1)
 
-        print(now, last_day_of_month)
+        current_datetime = datetime.now()
+        current_date = current_datetime.date()
+        last_day = calendar.monthrange(
+            current_datetime.year, current_datetime.month)[1]
+
+        # Set the day of the datetime object to the last day of the month
+        last_date_of_month = current_datetime.replace(day=last_day)
+
+        print(current_date, last_date_of_month.date())
 
         todaynow = timezone.now().date()
         start_of_month = todaynow.replace(day=1)
         # print(start_of_month)
         # print(date.today())
 
-        if (now != last_day_of_month):
+        if (current_date != last_date_of_month):
             usernetsavings.objects.filter(
                 username=username).update(update_check=0)
 
@@ -145,6 +148,7 @@ def userlogin(request):
         useraccount.objects.filter(
             username=username).update(is_authenticated='yes')
 
+        login(request, user)
         return JsonResponse({'response': 'logged in'})
 
     else:
@@ -170,9 +174,12 @@ def userlogout(request):
 def isauthenticated(request):
     username = request.POST.get('username')
     print(username)
-    user = useraccount.objects.filter(username=username).get()
-    if user.is_authenticated == 'yes':
-        return JsonResponse({'response': 'authenticated'})
+    if useraccount.objects.filter(username=username).exists():
+        user = useraccount.objects.filter(username=username).get()
+        if user.is_authenticated == 'yes':
+            return JsonResponse({'response': 'authenticated'})
+        else:
+            return JsonResponse({'response': 'not authenticated'})
     else:
         return JsonResponse({'response': 'not authenticated'})
 
@@ -310,65 +317,69 @@ def getrecommendations(request, username):
     user_netsavings = usernetsavings.objects.filter(username=username).get()
     netsavings = user_netsavings.netsavings
     print(netsavings)
-    # Load the dataset
-    df = pd.read_csv(
-        "./dataset/travel_packages.csv")
+    if (netsavings > 0):
+        # Load the dataset
+        df = pd.read_csv(
+            "./dataset/travel_packages.csv")
 
-    # Drop the 'index' column
-    df.drop('index', axis=1, inplace=True)
+        # Drop the 'index' column
+        df.drop('index', axis=1, inplace=True)
 
-    # Label encode the 'place' column
-    le = LabelEncoder()
-    df['place'] = le.fit_transform(df['place'])
+        # Label encode the 'place' column
+        le = LabelEncoder()
+        df['place'] = le.fit_transform(df['place'])
 
-    # Convert the 'price' column to numeric
-    df['price'] = df['price'].str.replace(',', '').astype(float)
+        # Convert the 'price' column to numeric
+        df['price'] = df['price'].str.replace(',', '').astype(float)
 
-    # Convert the 'time' column to numeric
-    df['time'] = df['time'].str.extract('(\d+)', expand=False).astype(int)
+        # Convert the 'time' column to numeric
+        df['time'] = df['time'].str.extract('(\d+)', expand=False).astype(int)
 
-    # Drop the 'about_trip' column
-    df.drop('about_trip', axis=1, inplace=True)
+        # Drop the 'about_trip' column
+        df.drop('about_trip', axis=1, inplace=True)
 
-    # Convert the 'emi' column to numeric
-    df['emi'] = df['emi'].str.extract('(\d+)', expand=False).astype(float)
+        # Convert the 'emi' column to numeric
+        df['emi'] = df['emi'].str.extract('(\d+)', expand=False).astype(float)
 
-    # Split the data into training and testing sets
-    X = df.drop('place', axis=1)
-    y = df['place']
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42)
+        # Split the data into training and testing sets
+        X = df.drop('place', axis=1)
+        y = df['place']
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42)
 
-    # Create a Random Forest Classifier and fit the model
-    rfc = RandomForestClassifier()
-    rfc.fit(X_train, y_train)
+        # Create a Random Forest Classifier and fit the model
+        rfc = RandomForestClassifier()
+        rfc.fit(X_train, y_train)
 
-    # Predict the best possible holiday destinations based on salary
-    salary = netsavings
-    # Retrieve the corresponding rows from the original DataFrame
-    # filter rows with price <= salary
-    X_pred = X_test[X_test['price'] <= salary]
-    y_pred = rfc.predict(X_pred)
-    # convert label encoded values back to original names
-    predicted_destinations = le.inverse_transform(y_pred)
+        # Predict the best possible holiday destinations based on salary
+        salary = netsavings
+        # Retrieve the corresponding rows from the original DataFrame
+        # filter rows with price <= salary
+        X_pred = X_test[X_test['price'] <= salary]
+        y_pred = rfc.predict(X_pred)
+        # convert label encoded values back to original names
+        predicted_destinations = le.inverse_transform(y_pred)
 
-    # Create a DataFrame with predicted destinations and their prices
-    predicted_destinations_df = X_pred.copy()
-    predicted_destinations_df['place'] = predicted_destinations
-    predicted_destinations_df = predicted_destinations_df[[
-        'place', 'price', 'time']]
+        # Create a DataFrame with predicted destinations and their prices
+        predicted_destinations_df = X_pred.copy()
+        predicted_destinations_df['place'] = predicted_destinations
+        predicted_destinations_df = predicted_destinations_df[[
+            'place', 'price', 'time']]
 
-    # Select the top 5 recommended destinations based on price and drop duplicates
-    recommended_destinations = predicted_destinations_df.sort_values(
-        by='price').drop_duplicates('place').head(30)
+        # Select the top 5 recommended destinations based on price and drop duplicates
+        recommended_destinations = predicted_destinations_df.sort_values(
+            by='price').drop_duplicates('place').head(30)
 
-    # Print the recommended destinations
-    data = []
-    for index, destination in recommended_destinations.iterrows():
-        data.append(
-            {'Place': destination['place'], 'amount': destination['price'], 'duration': destination['time']})
-    print(data)
-    return JsonResponse(data, safe=False)
+        # Print the recommended destinations
+        data = []
+        for index, destination in recommended_destinations.iterrows():
+            data.append(
+                {'Place': destination['place'], 'amount': destination['price'], 'duration': destination['time']})
+        print(data)
+        return JsonResponse(data, safe=False)
+    else:
+        data = []
+        return JsonResponse(data, safe=False)
 
 
 # get net savings
