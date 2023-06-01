@@ -60,7 +60,7 @@ Installation
 Feedback and Support
 --------------------
 
-If you encounter any issues, have suggestions for improvements, or need assistance, please reach out to our support team at <hardikjain1245@gmail.com>/<paarth2812@gmail.com>. We appreciate your feedback and are committed to providing the best possible user experience.
+If you encounter any issues, have suggestions for improvements, or need assistance, please reach out to us at <hardikjain1245@gmail.com>/<paarth2812@gmail.com>. We appreciate your feedback and are committed to providing the best possible user experience.
 
 Security and Privacy
 --------------------
