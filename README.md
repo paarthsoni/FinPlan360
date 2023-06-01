@@ -2,6 +2,20 @@ FinPlan360: Expense Tracking App
 ====================
 FinPlan360 is a mobile application designed to help users track their expenses by scanning and analyzing credit and debit messages on their mobile device. By creating visualized graphs and detailed reports, users can gain insights into their spending patterns and make better-informed financial decisions.
 
+Features
+--------
+
+-   User Registration and Login: Users can register for a new account or log in to an existing account using their credentials.
+-   Authentication: New users need to authenticate themselves with their PAN card number during the registration process.
+-   Income Details: For new users, the app collects their income details during the first login to provide personalized financial insights.
+-   Mobile Debit SMS Fetching: The app fetches and displays all the debit SMS on the user's mobile device to track their expenses accurately.
+-   Pie Chart Visualization: Users can view a pie chart that represents their expenses by category, giving them a visual overview of their spending habits.
+-   Tour Recommendation: The app recommends tours or travel options based on the user's expenses, helping them plan vacations or trips within their budget.
+-   Expense Categorization: Users can categorize their expenses, assigning them to specific categories to track their spending patterns accurately.
+-   Profile Management: Users can view and edit their personal information and app settings from the profile page.
+-   Logout and Login: Users can log out of the app, which directs them back to the login page for subsequent logins.
+
+
 Workflow of the App
 -------------------
 
@@ -32,18 +46,7 @@ Workflow of the App
     -   The user can also choose to log out of the app.
     -   After logging out, the user is directed back to the login page to start the process again.
 
-Features
---------
 
--   User Registration and Login: Users can register for a new account or log in to an existing account using their credentials.
--   Authentication: New users need to authenticate themselves with their PAN card number during the registration process.
--   Income Details: For new users, the app collects their income details during the first login to provide personalized financial insights.
--   Mobile Debit SMS Fetching: The app fetches and displays all the debit SMS on the user's mobile device to track their expenses accurately.
--   Pie Chart Visualization: Users can view a pie chart that represents their expenses by category, giving them a visual overview of their spending habits.
--   Tour Recommendation: The app recommends tours or travel options based on the user's expenses, helping them plan vacations or trips within their budget.
--   Expense Categorization: Users can categorize their expenses, assigning them to specific categories to track their spending patterns accurately.
--   Profile Management: Users can view and edit their personal information and app settings from the profile page.
--   Logout and Login: Users can log out of the app, which directs them back to the login page for subsequent logins.
 <!-- 
 Installation
 ------------
@@ -57,7 +60,7 @@ Installation
 Feedback and Support
 --------------------
 
-If you encounter any issues, have suggestions for improvements, or need assistance, please reach out to our support team at <hardikjain1245@gmail.com>. We appreciate your feedback and are committed to providing the best possible user experience.
+If you encounter any issues, have suggestions for improvements, or need assistance, please reach out to our support team at <hardikjain1245@gmail.com>/<paarth2812@gmail.com>. We appreciate your feedback and are committed to providing the best possible user experience.
 
 Security and Privacy
 --------------------
