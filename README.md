@@ -70,8 +70,7 @@ We take the security and privacy of your data seriously. The Expense Tracking Ap
 * * * * *
 
 ## Flowchart
-
-<img src="[https://user-images.githubusercontent.com/81674309/236137267-9613730c-eff2-4275-84ed-31eaa8412393)" width="500">
+<img src="https://github.com/HardikSJain/Ecomm-FakeStoreAPI/assets/81674309/236137267-9613730c-eff2-4275-84ed-31eaa8412393" width="200">
 
 * * * * *
 
