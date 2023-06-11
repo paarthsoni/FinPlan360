@@ -57,6 +57,15 @@ Installation
 4.  Complete any necessary authentication or income details setup process.
 5.  Once logged in, the app will guide you through the expense tracking options and provide insights into your spending habits.
  -->
+Screenshots
+------------
+<img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/9ed2253c-323a-4183-8abf-86a75202e3ff" alt="screenshot1" width="200">
+<img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/0e97d566-bc3b-4515-82d8-62c3af796a52" alt="screenshot2" width="200">
+<img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/aa2d8ff2-7f71-45b7-a456-7dbaddf428f4" alt="screenshot3" width="200">
+<img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/d5530641-4bb6-4f65-9b41-207f1e7a5b6c" alt="screenshot4" width="200">
+<img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/b4744888-ab42-4ac4-9716-8ab311763024" alt="screenshot5" width="200">
+
+ 
 Feedback and Support
 --------------------
 
@@ -70,7 +79,7 @@ We take the security and privacy of your data seriously. The Expense Tracking Ap
 * * * * *
 
 ## Flowchart
-<img src="https://github.com/HardikSJain/Ecomm-FakeStoreAPI/assets/81674309/236137267-9613730c-eff2-4275-84ed-31eaa8412393" width="200">
+<img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/af448af6-887e-46ff-b8ed-35cad7461ee5" alt="FlowChart" width="400">
 
 * * * * *
 
