@@ -4,7 +4,6 @@ import 'package:finplan360_frontend/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
-import 'package:finplan360_frontend/pages/salary_page.dart';
 import 'package:finplan360_frontend/constants/ip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

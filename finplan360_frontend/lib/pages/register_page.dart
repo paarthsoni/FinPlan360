@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:finplan360_frontend/components/my_button.dart';
 import 'package:finplan360_frontend/pages/auth_page.dart';
 import 'package:finplan360_frontend/pages/login_page.dart';
@@ -5,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../constants/ip.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -48,6 +53,57 @@ class _RegisterPageState extends State<RegisterPage> {
         dobController.text = DateFormat('yyyy-MM-dd').format(pickedDate);
       });
     });
+  }
+
+  bool _isloading = false;
+
+  Future<String> _postdata() async {
+    try {
+      setState(() {
+        _isloading = true;
+      });
+
+      var response =
+          await http.post(Uri.parse("http://$ip/api/register"), body: {
+        "firstname": firstNameController.text,
+        "lastname": lastNameController.text,
+        "dob": dobController.text,
+        "username": usernameController.text,
+        "password": passwordController.text,
+      });
+
+      var result = jsonDecode(response.body);
+
+      print(result);
+
+      if (result['response'] == 'Account Created Sucessfully') {
+        SharedPreferences login = await SharedPreferences.getInstance();
+        login.setBool('firstTimeLogin', true);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LoginPage(
+              isFromAuthPage: true,
+              isFromSalaryPage: false,
+            ),
+          ),
+        );
+      } else if (result['response'] == 'Username already exists') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Username already exists'),
+          ),
+        );
+      }
+    } catch (e) {
+      print("Error is $e ");
+    } finally {
+      setState(() {
+        _isloading = false;
+      });
+    }
+
+    return "";
   }
 
   bool _validateInputs() {
@@ -112,21 +168,6 @@ class _RegisterPageState extends State<RegisterPage> {
         content: Text(message),
       ),
     );
-    // showDialog(
-    //   context: context,
-    //   builder: (ctx) => AlertDialog(
-    //     title: const Text('Error'),
-    //     content: Text(message),
-    //     actions: [
-    //       TextButton(
-    //         onPressed: () {
-    //           Navigator.of(ctx).pop();
-    //         },
-    //         child: const Text('OK'),
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 
   @override
@@ -360,30 +401,21 @@ class _RegisterPageState extends State<RegisterPage> {
                 MyButton(
                   onTap: () {
                     // login
-                    try {} catch (e) {}
-                    if (!_validateInputs()) {
-                      return;
-                    }
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AuthPage(
-                          firstName: firstNameController.text,
-                          lastName: lastNameController.text,
-                          username: usernameController.text,
-                          dob: dobController.text,
-                          password: passwordController.text,
-                        ),
-                      ),
-                    );
-                    // }
-                    // else {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text('Password does not match'),
+                    // _validateInputs() ?
+                    _postdata();
+                    // _postdata();
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => AuthPage(
+                    //       firstName: firstNameController.text,
+                    //       lastName: lastNameController.text,
+                    //       username: usernameController.text,
+                    //       dob: dobController.text,
+                    //       password: passwordController.text,
                     //     ),
-                    //   );
-                    // }
+                    //   ),
+                    // );
                   },
                   text: 'Sign Up',
                   isloading: false,
@@ -395,7 +427,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     const Text('Already have an account?'),
                     TextButton(
                       onPressed: () {
-                        // login page
                         Navigator.push(
                           context,
                           MaterialPageRoute(

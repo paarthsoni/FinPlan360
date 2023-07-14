@@ -27,79 +27,78 @@ def useraccountdetails(request):
     username = request.POST.get("username")
     password = request.POST.get("password")
     hashed_pwd = make_password(password)
-    aadharorpan = request.POST.get("aadharorpan")
+    # aadharorpan = request.POST.get("aadharorpan")
 
-    print(firstname, lastname, dob, username, password, aadharorpan)
+    print(firstname, lastname, dob, username, password,
+        #    aadharorpan
+           )
     flag = 0
 
     if (useraccount.objects.filter(username=username).exists()):
         flag = 1
 
-    resultpan = False
-    for e in useraccount.objects.all():
-        result = check_password(aadharorpan, e.panoraadhar)
-        if result == True:
-            resultpan = True
-            break
+    # resultpan = False
+    # for e in useraccount.objects.all():
+    #     result = check_password(aadharorpan, e.panoraadhar)
+    #     if result == True:
+    #         resultpan = True
+    #         break
 
-    print(resultpan)
-    if flag != 1 and resultpan == False:
-        if len(aadharorpan) == 10:
+    # print(resultpan)
+    if flag != 1 :
+    #     if len(aadharorpan) == 10:
 
-            url = "https://pan-card-verification1.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan"
+    #         url = "https://pan-card-verification1.p.rapidapi.com/v3/tasks/sync/verify_with_source/ind_pan"
 
-            payload = {
-                "task_id": "74f4c926-250c-43ca-9c53-453e87ceacd1",
-                "group_id": "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
-                "data": {"id_number": aadharorpan}
-            }
-            headers = {
-                "content-type": "application/json",
-                "X-RapidAPI-Key": "707f1cec22mshb131327fd722355p1708efjsn5c3ad3367dec",
-                "X-RapidAPI-Host": "pan-card-verification1.p.rapidapi.com"
-            }
+    #         payload = {
+    #             "task_id": "74f4c926-250c-43ca-9c53-453e87ceacd1",
+    #             "group_id": "8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e",
+    #             "data": {"id_number": aadharorpan}
+    #         }
+    #         headers = {
+    #             "content-type": "application/json",
+    #             "X-RapidAPI-Key": "707f1cec22mshb131327fd722355p1708efjsn5c3ad3367dec",
+    #             "X-RapidAPI-Host": "pan-card-verification1.p.rapidapi.com"
+    #         }
 
-            response = requests.post(url, json=payload, headers=headers)
+    #         response = requests.post(url, json=payload, headers=headers)
 
-            print(response.json())
+    #         print(response.json())
 
-            print(response.text)
-            response = response.json()
+    #         print(response.text)
+    #         response = response.json()
 
-            if 'result' in response:
-                fname = response['result']['source_output']['first_name']
-                lname = response['result']['source_output']['last_name']
-                if firstname == fname and lastname == lname:
+            # if 'result' in response:
+                # fname = response['result']['source_output']['first_name']
+                # lname = response['result']['source_output']['last_name']
+    #             if firstname == fname and lastname == lname:
 
-                    user = User.objects.create_user(
-                        username=username, password=password)
-                    userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username,
-                                           password=hashed_pwd, panoraadhar=make_password(aadharorpan), acc_creation_date=datetime.now())
-                    netsavings_user = usernetsavings(
-                        username=username, netsavings=10000, update_check=0)
-                    user_message_delete_check = user_message_deletecheck(
+        user = User.objects.create_user(username=username, password=password)
+        userdata = useraccount(firstname=firstname, lastname=lastname, dob=dob, username=username, password=hashed_pwd, acc_creation_date=datetime.now())
+        netsavings_user = usernetsavings(username=username, netsavings=10000, update_check=0)
+        user_message_delete_check = user_message_deletecheck(
                         username=username, message_delete_check=0)
-                    user.save()
-                    userdata.save()
-                    netsavings_user.save()
-                    user_message_delete_check.save()
+        user.save()
+        userdata.save()
+        netsavings_user.save()
+        user_message_delete_check.save()
                     # print("matched")
-                    return JsonResponse({'response': 'Account Created Sucessfully'})
+        return JsonResponse({'response': 'Account Created Sucessfully'})
 
-            elif 'result' not in response:
-                return JsonResponse({'response': 'Invalid Pan number'})
-        # elif len(aadharorpan) == 12:
-        #     d
+    #         elif 'result' not in response:
+    #             return JsonResponse({'response': 'Invalid Pan number'})
+    #     # elif len(aadharorpan) == 12:
+    #     #     d
 
-        else:
-            return JsonResponse({'response': 'Invalid Pan number'})
+    #     else:
+    #         return JsonResponse({'response': 'Invalid Pan number'})
     elif flag == 1:
         return JsonResponse({'response': 'Username already exists'})
 
-    elif resultpan == True:
-        return JsonResponse({'response': 'Pan exists'})
+    # elif resultpan == True:
+        # return JsonResponse({'response': 'Pan exists'})
 
-    # return HttpResponse('v')
+    return HttpResponse('v')
 
 
 @csrf_exempt
