@@ -8,7 +8,7 @@ class useraccount(models.Model):
     dob = models.DateField(null=False, default="")
     username = models.CharField(null=False, unique=True, max_length=1024)
     password = models.CharField(null=False, default="", max_length=1024)
-    panoraadhar = models.CharField(null=False, default="", max_length=12)
+    panoraadhar = models.CharField(null=True, default="", max_length=12)
     acc_creation_date = models.DateTimeField(
         default=datetime.now(), blank=None, null=None)
     is_authenticated = models.CharField(null=False, default="no", max_length=3)
