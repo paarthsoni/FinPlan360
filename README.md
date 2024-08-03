@@ -65,6 +65,11 @@ Screenshots
 <img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/d5530641-4bb6-4f65-9b41-207f1e7a5b6c" alt="screenshot4" width="200">
 <img src="https://github.com/HardikSJain/FinPlan360/assets/81674309/b4744888-ab42-4ac4-9716-8ab311763024" alt="screenshot5" width="200">
 
+Research Paper Publication (IEEE Xplore Publication)
+---------------------------
+
+<a href="https://ieeexplore.ieee.org/document/10353348">Click Here to View the Published Paper in IEEE Xplore</a>.
+
  
 Feedback and Support
 --------------------
